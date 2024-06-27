@@ -1,11 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Image, StyleSheet, StatusBar } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Image, Alert, StyleSheet, StatusBar } from 'react-native';
+// Aca agregue el Alert en la linea de arriba
 import axios from 'axios';
 import { Ionicons } from '@expo/vector-icons';
 
-const ServiciosVecino = ({ navigation }) => {
+const ServiciosVecino = ({route,navigation }) => {
+  // Aca decia 
+  // const ServiciosVecino = ({navigation}), ahora dice como arriba
   const [serviciosComercios, setServiciosComercios] = useState([]);
   const [serviciosProfesionales, setServiciosProfesionales] = useState([]);
+
+  // Agregue las 2 lineas de aca abajo amigo
+  const { mail } = route.params; // Agarramos el mail que nos paso en LoginVecino en route, y despues con este mail vamos a ir haciendo cosas
+  Alert.alert("el mail es: "+mail);  // Este alert es para mostrar que me lo trajo al dato amigo, nada mas, si queres borralo
 
   useEffect(() => {
     const fetchServiciosComercios = async () => {
