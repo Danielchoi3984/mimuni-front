@@ -1,17 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, Image, StyleSheet, Alert, ScrollView, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 
 const PerfilVecino = ({ route, navigation }) => {
-  const [perfil, setPerfil] = useState(null); // Inicializamos perfil como null para indicar que aún no se han cargado los datos
+  const [perfil, setPerfil] = useState(null);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmNewPassword, setConfirmNewPassword] = useState('');
   const { mail } = route.params || {};
 
   useEffect(() => {
     const fetchPerfil = async () => {
       try {
         const response = await axios.get(`http://localhost:8080/inicio/perfilVecino?mail=${mail}`);
-        setPerfil(response.data); // Actualizamos el estado con los datos recibidos del servidor
+        setPerfil(response.data);
       } catch (error) {
         console.error('Error fetching perfil:', error);
         Alert.alert('Error', 'Hubo un problema al obtener los datos del perfil');
@@ -19,11 +22,41 @@ const PerfilVecino = ({ route, navigation }) => {
     };
 
     if (mail) {
-      fetchPerfil(); // Llamamos a la función para cargar el perfil cuando mail esté disponible
+      fetchPerfil();
     }
-  }, [mail]); // Dependencia de efecto: se ejecutará cada vez que mail cambie
+  }, [mail]);
 
-  // Si perfil es null, mostrar un mensaje de carga o un indicador de carga
+  const handlePasswordChange = async () => {
+    if (newPassword !== confirmNewPassword) {
+      Alert.alert('Error', 'Las contraseñas nuevas no coinciden');
+      return;
+    }
+
+    try {
+      const response = await axios.put(`http://localhost:8080/inicio/cambiarContraseniaVecino`, null, {
+        params: {
+          mail,
+          actual: currentPassword,
+          nueva1: newPassword,
+          nueva2: confirmNewPassword,
+        },
+      });
+
+      if (response.status === 200) {
+        Alert.alert('Éxito', 'Cambio de contraseña exitoso');
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmNewPassword('');
+      }
+    } catch (error) {
+      Alert.alert('Error', error.response.data);
+    }
+  };
+
+  const handleLogout = () => {
+    navigation.navigate('LoginVecino'); // Ajusta esto según el nombre de tu pantalla de inicio de sesión
+  };
+
   if (!perfil) {
     return (
       <View style={styles.container}>
@@ -39,26 +72,68 @@ const PerfilVecino = ({ route, navigation }) => {
           <Ionicons name="arrow-back" size={24} color="white" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Mimuni</Text>
-        <View style={{ width: 20 }}></View>
+        <Ionicons name="mail" size={24} color="white" />
       </View>
-      <Text style={styles.title}>Perfil de Vecino</Text>
-      <View style={styles.content}>
-        <Text style={styles.label}>Documento:</Text>
-        <Text style={styles.text}>{perfil.documento}</Text>
-        <Text style={styles.label}>Nombre:</Text>
-        <Text style={styles.text}>{perfil.nombre}</Text>
-        <Text style={styles.label}>Apellido:</Text>
-        <Text style={styles.text}>{perfil.apellido}</Text>
-        <Text style={styles.label}>Dirección:</Text>
-        <Text style={styles.text}>{perfil.direccion}</Text>
-        <Text style={styles.label}>Código de Barrio:</Text>
-        <Text style={styles.text}>{perfil.codigobarrio}</Text>
-      </View>
+      <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+        <Text style={styles.title}>Datos Personales</Text>
+        <View style={styles.content}>
+          <View style={styles.row}>
+            <Text style={styles.label}>Nombre:</Text>
+            <Text style={styles.text}>{perfil.nombre}</Text>
+          </View>
+          <View style={styles.row}>
+            <Text style={styles.label}>Apellido:</Text>
+            <Text style={styles.text}>{perfil.apellido}</Text>
+          </View>
+          <View style={styles.row}>
+            <Text style={styles.label}>Documento:</Text>
+            <Text style={styles.text}>{perfil.documento}</Text>
+          </View>
+          <View style={styles.row}>
+            <Text style={styles.label}>Dirección:</Text>
+            <Text style={styles.text}>{perfil.direccion}</Text>
+          </View>
+          <View style={styles.row}>
+            <Text style={styles.label}>Código de Barrio:</Text>
+            <Text style={styles.text}>{perfil.codigobarrio}</Text>
+          </View>
+        </View>
+        <Text style={styles.title}>Cambiar Contraseña</Text>
+        <View style={styles.passwordChange}>
+          <Text style={styles.label}>Contraseña actual</Text>
+          <TextInput
+            style={styles.input}
+            value={currentPassword}
+            onChangeText={setCurrentPassword}
+            secureTextEntry
+            placeholder="Ingrese su contraseña actual"
+          />
+          <Text style={styles.label}>Contraseña nueva</Text>
+          <TextInput
+            style={styles.input}
+            value={newPassword}
+            onChangeText={setNewPassword}
+            secureTextEntry
+            placeholder="Ingrese su nueva contraseña"
+          />
+          <Text style={styles.label}>Confirma nueva</Text>
+          <TextInput
+            style={styles.input}
+            value={confirmNewPassword}
+            onChangeText={setConfirmNewPassword}
+            secureTextEntry
+            placeholder="Confirme su nueva contraseña"
+          />
+          <TouchableOpacity style={styles.button} onPress={handlePasswordChange}>
+            <Text style={styles.buttonText}>Aceptar</Text>
+          </TouchableOpacity>
+        </View>
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <Text style={styles.buttonText}>Cerrar Sesión</Text>
+        </TouchableOpacity>
+      </ScrollView>
       <View style={styles.navbar}>
-        <TouchableOpacity 
-          style={styles.navButton} 
-          onPress={() => navigation.navigate('ServiciosVecino', { mail })}
-        >
+        <TouchableOpacity style={styles.navButton} onPress={() => navigation.navigate('ServiciosVecino', { mail })}>
           <Image source={require('./assets/servicios.png')} style={styles.icon} />
           <Text style={styles.navText}>Servicios</Text>
         </TouchableOpacity>
@@ -70,10 +145,7 @@ const PerfilVecino = ({ route, navigation }) => {
           <Image source={require('./assets/denuncias.png')} style={styles.icon} />
           <Text style={styles.navText}>Denuncias</Text>
         </TouchableOpacity>
-        <TouchableOpacity 
-          style={styles.navButton}
-          onPress={() => navigation.navigate('PerfilVecino', { mail })}
-        >
+        <TouchableOpacity style={styles.navButton} onPress={() => navigation.navigate('PerfilVecino', { mail })}>
           <Image source={require('./assets/perfil.png')} style={styles.icon} />
           <Text style={styles.navText}>Perfil</Text>
         </TouchableOpacity>
@@ -86,7 +158,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F2E9E4',
-    paddingTop: 0,
+  },
+  scrollContainer: {
+    paddingBottom: 100, // Padding bottom to prevent content from being hidden behind navbar
   },
   header: {
     backgroundColor: '#4A4E69',
@@ -107,23 +181,63 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginTop: 20,
+    marginBottom: 10,
     textAlign: 'center',
   },
   content: {
-    paddingHorizontal: 30,
-    marginBottom: 30,
+    backgroundColor: '#9A8C98',
+    padding: 20,
+    margin: 20,
+    borderRadius: 10,
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  passwordChange: {
+    backgroundColor: '#9A8C98',
+    padding: 20,
+    margin: 20,
+    borderRadius: 10,
   },
   label: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
-    marginBottom: 5,
+    color: 'white',
+    marginRight: 10,
   },
   text: {
     fontSize: 16,
+    color: 'white',
+    flex: 1,
+  },
+  input: {
+    backgroundColor: 'white',
+    fontSize: 16,
+    padding: 10,
+    borderRadius: 5,
     marginBottom: 15,
+  },
+  button: {
+    backgroundColor: '#4A4E69',
+    padding: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  logoutButton: {
+    backgroundColor: '#4A4E69',
+    padding: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+    margin: 20,
   },
   navbar: {
     flexDirection: 'row',
