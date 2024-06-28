@@ -3,9 +3,12 @@ import { View, Text, ScrollView, TouchableOpacity, Image, StyleSheet, StatusBar 
 import axios from 'axios';
 import { Ionicons } from '@expo/vector-icons';
 
-const ServiciosInspector = ({ navigation }) => {
+const ServiciosInspector = ({ route, navigation }) => {
   const [serviciosComercios, setServiciosComercios] = useState([]);
   const [serviciosProfesionales, setServiciosProfesionales] = useState([]);
+
+
+
 
   useEffect(() => {
     const fetchServiciosComercios = async () => {
@@ -90,6 +93,7 @@ const ServiciosInspector = ({ navigation }) => {
         </TouchableOpacity>
         <TouchableOpacity style={styles.navButton}>
           {/* Boton Personita */}
+          {/* onPress={() => navigation.navigate('PerfilInspector', { legajo })} */}
           <Image source={require('./assets/perfil.png')} style={styles.icon} />
           <Text style={styles.navText}>Perfil</Text>
         </TouchableOpacity>

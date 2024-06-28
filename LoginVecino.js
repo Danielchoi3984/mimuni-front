@@ -27,8 +27,6 @@ const LoginVecino = ({ navigation }) => {
           Alert.alert('Ingreso exitoso', 'Has ingresado exitosamente.', [
             {
               text: 'OK',
-              // ACA ANTES ESTABA ASI AMIGO
-              //  onPress: () => navigation.navigate('ServiciosVecino'), LO TUVE QUE CAMBIAR PARA QUE LE PASE EL MAIL
               onPress: () => navigation.navigate('ServiciosVecino', { mail }),
             },
           ]);

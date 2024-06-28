@@ -29,7 +29,7 @@ const LoginInspector = () => {
           Alert.alert('Ingreso exitoso', 'Has ingresado exitosamente.', [
             {
               text: 'OK',
-              onPress: () => navigation.navigate('ServiciosInspector'),
+              onPress: () => navigation.navigate('ServiciosInspector', {legajo}),
             },
           ]);
         } else {

@@ -33,7 +33,7 @@ const LoginInicial = () => {
     <View style={styles.container}>
       <CustomHeader onPressBack={handleBackPress} />
       <View style={styles.content}>
-        <Text style={styles.title}>Iniciar SesiÃ³n</Text>
+        <Text style={styles.title}>Iniciar Sesión</Text>
         <TouchableOpacity style={styles.button} onPress={handleVecinoPress}>
           <Text style={styles.buttonText}>Vecino del Municipio</Text>
         </TouchableOpacity>

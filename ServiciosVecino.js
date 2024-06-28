@@ -1,18 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Image, Alert, StyleSheet, StatusBar } from 'react-native';
-// Aca agregue el Alert en la linea de arriba
 import axios from 'axios';
 import { Ionicons } from '@expo/vector-icons';
 
-const ServiciosVecino = ({route,navigation }) => {
-  // Aca decia 
-  // const ServiciosVecino = ({navigation}), ahora dice como arriba
+const ServiciosVecino = ({ route, navigation }) => {
   const [serviciosComercios, setServiciosComercios] = useState([]);
   const [serviciosProfesionales, setServiciosProfesionales] = useState([]);
 
-  // Agregue las 2 lineas de aca abajo amigo
-  const { mail } = route.params; // Agarramos el mail que nos paso en LoginVecino en route, y despues con este mail vamos a ir haciendo cosas
-  Alert.alert("el mail es: "+mail);  // Este alert es para mostrar que me lo trajo al dato amigo, nada mas, si queres borralo
+  // Verifica si route.params existe y asigna un valor predeterminado
+  const { mail } = route.params || {};
 
   useEffect(() => {
     const fetchServiciosComercios = async () => {
@@ -53,9 +49,9 @@ const ServiciosVecino = ({route,navigation }) => {
           <Text style={styles.cardText}><Text style={styles.boldText}>Rubro:</Text> {servicio.rubro}</Text>
         </View>
       )}
-      {servicio.direccion !== undefined &&(
+      {servicio.direccion !== undefined && (
         <View style={{ flexDirection: "column" }}>
-            <Text style={styles.cardText}><Text style={styles.boldText}>Dirección:</Text> {servicio.direccion}</Text>
+          <Text style={styles.cardText}><Text style={styles.boldText}>Dirección:</Text> {servicio.direccion}</Text>
         </View>
       )}
       <Text style={styles.cardText}><Text style={styles.boldText}>Contacto:</Text> {servicio.contacto}</Text>
@@ -96,7 +92,10 @@ const ServiciosVecino = ({route,navigation }) => {
         {serviciosProfesionales.map((servicio, index) => renderCard(servicio, index))}
       </ScrollView>
       <View style={styles.navbar}>
-        <TouchableOpacity style={styles.navButton}>
+        <TouchableOpacity 
+          style={styles.navButton}
+          onPress={() => navigation.navigate('ServiciosVecino', { mail })} 
+        >
           <Image source={require('./assets/servicios.png')} style={styles.icon} />
           <Text style={styles.navText}>Servicios</Text>
         </TouchableOpacity>
@@ -110,7 +109,7 @@ const ServiciosVecino = ({route,navigation }) => {
         </TouchableOpacity>
         <TouchableOpacity 
           style={styles.navButton}
-          onPress={() => navigation.navigate('PerfilVecino')} // Navegar a PerfilVecino
+          onPress={() => navigation.navigate('PerfilVecino', { mail })} 
         >
           <Image source={require('./assets/perfil.png')} style={styles.icon} />
           <Text style={styles.navText}>Perfil</Text>
@@ -124,7 +123,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F2E9E4',
-    paddingTop: 0, // Elimina el espacio en blanco en la parte superior
+    paddingTop: 0,
   },
   header: {
     backgroundColor: '#4A4E69',
@@ -146,7 +145,7 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     paddingHorizontal: 15,
-    paddingBottom: 60, // Ajuste para evitar que el contenido se solape con el navbar
+    paddingBottom: 60,
   },
   subtitle: {
     fontSize: 22,
@@ -178,7 +177,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  
   buttonText: {
     color: '#FFF',
     fontWeight: 'bold',
@@ -192,8 +190,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#4A4E69',
     paddingHorizontal: 15,
     paddingVertical: 10,
-    position: 'absolute', // Fija el navbar en la parte inferior
-    bottom: 0, // Alinea el navbar en la parte inferior
+    position: 'absolute',
+    bottom: 0,
     left: 0,
     right: 0,
   },
@@ -209,10 +207,10 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 12,
   },
-  cardImage: { // Estilo para la imagen dentro de la tarjeta
-    width: '100%', // Ancho igual al 100% del contenedor (tarjeta)
-    height: 200, // Altura fija para controlar el tamaño de la imagen
-    borderRadius: 10, // Bordes redondeados para que coincidan con la tarjeta
+  cardImage: {
+    width: '100%',
+    height: 200,
+    borderRadius: 10,
   },
 });
 
