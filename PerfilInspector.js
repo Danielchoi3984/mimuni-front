@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet, Alert, ScrollView, TextInput } from 'react-native';
+import { View, Text, TouchableOpacity, Image, StatusBar, StyleSheet, Alert, ScrollView, TextInput } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 
@@ -67,6 +68,7 @@ const PerfilInspector = ({ route, navigation }) => {
 
   return (
     <View style={styles.container}>
+      <StatusBar/>
       <View style={styles.header}>
         <TouchableOpacity style={styles.backIcon} onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={24} color="white" />

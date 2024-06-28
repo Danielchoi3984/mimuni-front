@@ -31,7 +31,7 @@ const OlvideContrasenia = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <StatusBar hidden />
+      <StatusBar />
       <View style={styles.header}>
         <TouchableOpacity style={styles.backIcon} onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={24} color="white" />
