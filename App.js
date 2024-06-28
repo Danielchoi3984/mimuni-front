@@ -21,6 +21,7 @@ import OlvideContrasenia from "./OlvideContrasenia";
 import GenerarServicio from "./GenerarServicio";
 import EliminarServicio from "./EliminarServicio";
 import PerfilVecino from "./PerfilVecino";
+import PerfilInspector from "./PerfilInspector";
 
 const Stack = createStackNavigator();
 
@@ -178,6 +179,11 @@ export default function App() {
         <Stack.Screen
           name="PerfilVecino"
           component={PerfilVecino}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="PerfilInspector"
+          component={PerfilInspector}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>
