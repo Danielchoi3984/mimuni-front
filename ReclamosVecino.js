@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Image, StyleSheet, StatusBar, Switch, Modal } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Image, StyleSheet, StatusBar, Switch, Modal, FlatList } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 const ReclamosVecino = ({ route, navigation }) => {
@@ -7,6 +7,7 @@ const ReclamosVecino = ({ route, navigation }) => {
   const [reclamos, setReclamos] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [movimientosReclamo, setMovimientosReclamo] = useState([]);
+  const [imagenesReclamo, setImagenesReclamo] = useState([]);
   const { mail } = route.params || {};
 
   useEffect(() => {
@@ -29,9 +30,17 @@ const ReclamosVecino = ({ route, navigation }) => {
       .then(response => response.json())
       .then(data => {
         setMovimientosReclamo(data);
+        fetchImagenesReclamo(idReclamo); // Llamar a la función para obtener imágenes
         setModalVisible(true);
       })
       .catch(error => console.error('Error fetching movimientos de reclamo:', error));
+  };
+
+  const fetchImagenesReclamo = (idReclamo) => {
+    fetch(`http://192.168.1.12:8080/inicio/imagenesReclamo?idReclamo=${idReclamo}`)
+      .then(response => response.json())
+      .then(data => setImagenesReclamo(data))
+      .catch(error => console.error('Error fetching imagenes de reclamo:', error));
   };
 
   React.useLayoutEffect(() => {
@@ -112,6 +121,17 @@ const ReclamosVecino = ({ route, navigation }) => {
                 <Text style={styles.modalText}><Text style={styles.boldText}>Responsable:</Text> {movimiento.responsable}</Text>
               </View>
             ))}
+            <Text style={styles.modalText}>Imágenes del Reclamo:</Text>
+            <FlatList
+              data={imagenesReclamo}
+              keyExtractor={(item, index) => index.toString()}
+              renderItem={({ item }) => (
+                <Image
+                  source={{ uri: item }}
+                  style={{ width: 200, height: 200, marginBottom: 10 }}
+                />
+              )}
+            />
             <TouchableOpacity
               style={{ ...styles.openButton, backgroundColor: '#2196F3' }}
               onPress={() => {
