@@ -15,6 +15,8 @@ import GenerarServicio from "./GenerarServicio";
 import EliminarServicio from "./EliminarServicio";
 import PerfilVecino from "./PerfilVecino";
 import PerfilInspector from "./PerfilInspector";
+import ReclamosVecino from "./ReclamosVecino";
+import GenerarReclamoVecino from "./GenerarReclamoVecino";
 
 const Stack = createStackNavigator();
 
@@ -185,6 +187,16 @@ export default function App() {
         <Stack.Screen
           name="PerfilInspector"
           component={PerfilInspector}
+          options={{ headerShown: false }}
+        />
+          <Stack.Screen
+          name="ReclamosVecino"
+          component={ReclamosVecino}
+          options={{ headerShown: false }}
+        />
+                  <Stack.Screen
+          name="GenerarReclamoVecino"
+          component={GenerarReclamoVecino}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

@@ -9,6 +9,7 @@ const PerfilVecino = ({ route, navigation }) => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
   const { mail } = route.params || {};
+  Alert.alert("El mail es: " + mail);
 
   useEffect(() => {
     const fetchPerfil = async () => {
@@ -137,7 +138,7 @@ const PerfilVecino = ({ route, navigation }) => {
           <Image source={require('./assets/servicios.png')} style={styles.icon} />
           <Text style={styles.navText}>Servicios</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.navButton}>
+        <TouchableOpacity style={styles.navButton} onPress={() => navigation.navigate('ReclamosVecino', { mail })}>
           <Image source={require('./assets/reclamos.png')} style={styles.icon} />
           <Text style={styles.navText}>Reclamos</Text>
         </TouchableOpacity>
