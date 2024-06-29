@@ -12,7 +12,7 @@ const ServiciosInspector = ({ route, navigation }) => {
   useEffect(() => {
     const fetchServiciosComercios = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/inicio/servicios/comercios');
+        const response = await axios.get('http://192.168.1.12:8080/inicio/servicios/comercios');
         setServiciosComercios(response.data);
       } catch (error) {
         console.error('Error fetching comercios:', error);
