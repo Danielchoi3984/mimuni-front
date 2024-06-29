@@ -1,12 +1,26 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Alert, Image, StyleSheet, StatusBar, Switch } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 const ReclamosVecino = ({ route, navigation }) => {
-  const [showMyReclamos, setShowMyReclamos] = React.useState(false);
+  const [showMyReclamos, setShowMyReclamos] = useState(false);
+  const [reclamos, setReclamos] = useState([]);
 
   const { mail } = route.params || {};
-  Alert.alert("El mail es: " + mail);
+
+  useEffect(() => {
+    if (showMyReclamos) {
+      fetch(`http://192.168.1.12:8080/inicio/misReclamosVecino?mail=${mail}`)
+        .then(response => response.json())
+        .then(data => setReclamos(data))
+        .catch(error => console.error('Error fetching mis reclamosPropios:', error));
+    } else {
+      fetch('http://192.168.1.12:8080/inicio/todosReclamos')
+        .then(response => response.json())
+        .then(data => setReclamos(data))
+        .catch(error => console.error('Error fetching reclamosMunicipio:', error));
+    }
+  }, [showMyReclamos, mail]);
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
@@ -48,22 +62,25 @@ const ReclamosVecino = ({ route, navigation }) => {
           />
           <Text style={styles.switchText}>Ver mis reclamos</Text>
         </View>
-        <View style={styles.reclamoCard}>
-          {/* <Image source={require('/mnt/data/image.png')} style={styles.reclamoImage} /> */}
-          <Text style={styles.reclamoText}>ID: 123</Text>
-          <Text style={styles.reclamoText}>Documento: 14123123</Text>
-          <Text style={styles.reclamoText}>Dirección: Avenida La Plata 456</Text>
-          <Text style={styles.reclamoText}>Tipo Desperfecto: Infraestructura</Text>
-          <Text style={styles.reclamoText}>Estado: Abierto</Text>
-          <Text style={styles.reclamoText}>ID Reclamo Unificado: 111</Text>
-          <Text style={styles.reclamoText}>Descripción: Falta iluminación en la plaza Aguero</Text>
-          <TouchableOpacity style={styles.imageButton} onPress={handleAddImage}>
-            <Text style={styles.imageButtonText}>Agregar Imagen</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.movimientosButton}>
-            <Text style={styles.movimientosButtonText}>Movimientos</Text>
-          </TouchableOpacity>
-        </View>
+        {reclamos.map((reclamo) => (
+          <View key={reclamo.idReclamo} style={styles.reclamoCard}>
+            <Text style={styles.reclamoText}>ID: {reclamo.idReclamo}</Text>
+            <Text style={styles.reclamoText}>Documento: {reclamo.documento}</Text>
+            <Text style={styles.reclamoText}>Dirección: {reclamo.idSitio}</Text>
+            <Text style={styles.reclamoText}>Tipo Desperfecto: {reclamo.idDesperfecto}</Text>
+            <Text style={styles.reclamoText}>Estado: {reclamo.estado}</Text>
+            <Text style={styles.reclamoText}>ID Reclamo Unificado: {reclamo.idReclamoUnificado}</Text>
+            <Text style={styles.reclamoText}>Descripción: {reclamo.descripcion}</Text>
+            {showMyReclamos && (
+              <TouchableOpacity style={styles.imageButton} onPress={handleAddImage}>
+                <Text style={styles.imageButtonText}>Agregar Imagen</Text>
+              </TouchableOpacity>
+            )}
+            <TouchableOpacity style={styles.movimientosButton}>
+              <Text style={styles.movimientosButtonText}>Movimientos</Text>
+            </TouchableOpacity>
+          </View>
+        ))}
       </ScrollView>
       <View style={styles.navbar}>
         <TouchableOpacity style={styles.navButton} onPress={() => navigation.navigate('ServiciosVecino', { mail })}>
