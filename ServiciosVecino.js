@@ -6,8 +6,8 @@ import { Ionicons } from '@expo/vector-icons';
 const ServiciosVecino = ({ route, navigation }) => {
   const [serviciosComercios, setServiciosComercios] = useState([]);
   const [serviciosProfesionales, setServiciosProfesionales] = useState([]);
+  const [showComercios, setShowComercios] = useState(true);
 
-  // Verifica si route.params existe y asigna un valor predeterminado
   const { mail } = route.params || {};
 
   useEffect(() => {
@@ -86,10 +86,31 @@ const ServiciosVecino = ({ route, navigation }) => {
             <Text style={styles.buttonText}>Eliminar Servicio</Text>
           </TouchableOpacity>
         </View>
-        <Text style={styles.subtitle}>Comercios</Text>
-        {serviciosComercios.map((servicio, index) => renderCard(servicio, index))}
-        <Text style={styles.subtitle}>Profesionales</Text>
-        {serviciosProfesionales.map((servicio, index) => renderCard(servicio, index))}
+        <View style={styles.switchContainer}>
+          <TouchableOpacity
+            style={[styles.switchButton, showComercios ? styles.activeButton : null]}
+            onPress={() => setShowComercios(true)}
+          >
+            <Text style={styles.switchButtonText}>Comercios</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.switchButton, !showComercios ? styles.activeButton : null]}
+            onPress={() => setShowComercios(false)}
+          >
+            <Text style={styles.switchButtonText}>Profesionales</Text>
+          </TouchableOpacity>
+        </View>
+        {showComercios ? (
+          <>
+            <Text style={styles.subtitle}>Comercios</Text>
+            {serviciosComercios.map((servicio, index) => renderCard(servicio, index))}
+          </>
+        ) : (
+          <>
+            <Text style={styles.subtitle}>Profesionales</Text>
+            {serviciosProfesionales.map((servicio, index) => renderCard(servicio, index))}
+          </>
+        )}
       </ScrollView>
       <View style={styles.navbar}>
         <TouchableOpacity 
@@ -184,6 +205,26 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 20,
   },
+  switchContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginVertical: 10,
+  },
+  switchButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    backgroundColor: '#8C7D85',
+    borderRadius: 5,
+    marginHorizontal: 5,
+  },
+  activeButton: {
+    backgroundColor: '#4A4E69',
+  },
+  switchButtonText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
   navbar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -204,13 +245,15 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   navText: {
-    color: 'white',
+    color: '#FFF',
     fontSize: 12,
   },
   cardImage: {
     width: '100%',
     height: 200,
+    resizeMode: 'cover',
     borderRadius: 10,
+    marginBottom: 10,
   },
 });
 

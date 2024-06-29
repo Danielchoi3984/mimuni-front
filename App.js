@@ -1,6 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useState } from "react";
-import {StyleSheet,Text,View,ScrollView,TouchableOpacity,Image,} from "react-native";
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Image } from "react-native";
 import axios from "axios";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -21,13 +21,12 @@ const Stack = createStackNavigator();
 const ServiciosScreen = ({ navigation }) => {
   const [serviciosComercios, setServiciosComercios] = useState([]);
   const [serviciosProfesionales, setServiciosProfesionales] = useState([]);
+  const [showComercios, setShowComercios] = useState(true);
 
   useEffect(() => {
     const fetchServiciosComercios = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:8080/inicio/servicios/comercios"
-        );
+        const response = await axios.get("http://localhost:8080/inicio/servicios/comercios");
         setServiciosComercios(response.data);
       } catch (error) {
         console.error("Error fetching comercios:", error);
@@ -36,9 +35,7 @@ const ServiciosScreen = ({ navigation }) => {
 
     const fetchServiciosProfesionales = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:8080/inicio/servicios/profesionales"
-        );
+        const response = await axios.get("http://localhost:8080/inicio/servicios/profesionales");
         setServiciosProfesionales(response.data);
       } catch (error) {
         console.error("Error fetching profesionales:", error);
@@ -51,15 +48,11 @@ const ServiciosScreen = ({ navigation }) => {
 
   const renderCard = (servicio, index) => (
     <View key={index} style={styles.card}>
-      <Image
-        source={require("./assets/luzRota.jpeg")}
-        style={styles.cardImage}
-      />
+      <Image source={require("./assets/luzRota.jpeg")} style={styles.cardImage} />
       {servicio.nombre !== undefined && (
         <View style={{ flexDirection: "column" }}>
           <Text style={styles.cardText}>
-            <Text style={styles.boldText}>Responsable:</Text>{" "}
-            {servicio.apellido + " " + servicio.nombre}
+            <Text style={styles.boldText}>Responsable:</Text> {servicio.apellido + " " + servicio.nombre}
           </Text>
           <Text style={styles.cardText}>
             <Text style={styles.boldText}>Horario:</Text> {servicio.horario}
@@ -94,27 +87,42 @@ const ServiciosScreen = ({ navigation }) => {
       <StatusBar style="auto" />
       <View style={styles.header}>
         <TouchableOpacity style={styles.headerIcon} onPress={handleLoginPress}>
-          <Image
-            source={require("./assets/BotonPersonita.png")}
-            style={styles.iconImage}
-          />
+          <Image source={require("./assets/BotonPersonita.png")} style={styles.iconImage} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>MiMuni</Text>
         <View style={{ width: 20 }}></View>
       </View>
       <ScrollView contentContainerStyle={styles.scrollView}>
-        <Text style={styles.subtitle}>Comercios</Text>
-        {serviciosComercios.map((servicio, index) =>
-          renderCard(servicio, index)
-        )}
-        <Text style={styles.subtitle}>Profesionales</Text>
-        {serviciosProfesionales.map((servicio, index) =>
-          renderCard(servicio, index)
+        <View style={styles.switchContainer}>
+          <TouchableOpacity
+            style={[styles.switchButton, showComercios ? styles.activeButton : null]}
+            onPress={() => setShowComercios(true)}
+          >
+            <Text style={styles.switchButtonText}>Comercios</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.switchButton, !showComercios ? styles.activeButton : null]}
+            onPress={() => setShowComercios(false)}
+          >
+            <Text style={styles.switchButtonText}>Profesionales</Text>
+          </TouchableOpacity>
+        </View>
+        {showComercios ? (
+          <>
+            <Text style={styles.subtitle}>Comercios</Text>
+            {serviciosComercios.map((servicio, index) => renderCard(servicio, index))}
+          </>
+        ) : (
+          <>
+            <Text style={styles.subtitle}>Profesionales</Text>
+            {serviciosProfesionales.map((servicio, index) => renderCard(servicio, index))}
+          </>
         )}
       </ScrollView>
     </View>
   );
 };
+
 export default function App() {
   return (
     <NavigationContainer>
@@ -234,19 +242,30 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   cardImage: {
-    // Estilo para la imagen dentro de la tarjeta
-    width: "100%", // Ancho igual al 100% del contenedor (tarjeta)
-    height: 200, // Altura fija para controlar el tamaño de la imagen
-    borderRadius: 10, // Bordes redondeados para que coincidan con la tarjeta
+    width: "100%",
+    height: 200,
+    borderRadius: 10,
   },
-  bottomImageContainer: {
-    position: "absolute",
-    bottom: 10,
-    alignSelf: "center",
+  switchContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginVertical: 10,
   },
-  bottomImage: {
-    width: 50,
-    height: 50,
+  switchButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    backgroundColor: "#8C7D85",
+    borderRadius: 5,
+    marginHorizontal: 5,
+  },
+  activeButton: {
+    backgroundColor: "#4A4E69",
+  },
+  switchButtonText: {
+    color: "#FFF",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });
+
 App.js;

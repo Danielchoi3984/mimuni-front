@@ -7,6 +7,7 @@ const ServiciosInspector = ({ route, navigation }) => {
   const { legajo } = route.params;
   const [serviciosComercios, setServiciosComercios] = useState([]);
   const [serviciosProfesionales, setServiciosProfesionales] = useState([]);
+  const [showComercios, setShowComercios] = useState(true);
 
   useEffect(() => {
     const fetchServiciosComercios = async () => {
@@ -59,7 +60,7 @@ const ServiciosInspector = ({ route, navigation }) => {
 
   return (
     <View style={styles.container}>
-      <StatusBar  />
+      <StatusBar />
       <View style={styles.header}>
         <TouchableOpacity style={styles.backIcon} onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={24} color="white" />
@@ -68,10 +69,31 @@ const ServiciosInspector = ({ route, navigation }) => {
         <View style={{ width: 20 }}></View>
       </View>
       <ScrollView contentContainerStyle={styles.scrollView}>
-        <Text style={styles.subtitle}>Comercios</Text>
-        {serviciosComercios.map((servicio, index) => renderCard(servicio, index))}
-        <Text style={styles.subtitle}>Profesionales</Text>
-        {serviciosProfesionales.map((servicio, index) => renderCard(servicio, index))}
+        <View style={styles.switchContainer}>
+          <TouchableOpacity
+            style={[styles.switchButton, showComercios ? styles.activeButton : null]}
+            onPress={() => setShowComercios(true)}
+          >
+            <Text style={styles.switchButtonText}>Comercios</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.switchButton, !showComercios ? styles.activeButton : null]}
+            onPress={() => setShowComercios(false)}
+          >
+            <Text style={styles.switchButtonText}>Profesionales</Text>
+          </TouchableOpacity>
+        </View>
+        {showComercios ? (
+          <>
+            <Text style={styles.subtitle}>Comercios</Text>
+            {serviciosComercios.map((servicio, index) => renderCard(servicio, index))}
+          </>
+        ) : (
+          <>
+            <Text style={styles.subtitle}>Profesionales</Text>
+            {serviciosProfesionales.map((servicio, index) => renderCard(servicio, index))}
+          </>
+        )}
       </ScrollView>
       <View style={styles.navbar}>
         <TouchableOpacity style={styles.navButton}>
@@ -140,6 +162,26 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   boldText: {
+    fontWeight: 'bold',
+  },
+  switchContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginVertical: 10,
+  },
+  switchButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    backgroundColor: '#8C7D85',
+    borderRadius: 5,
+    marginHorizontal: 5,
+  },
+  activeButton: {
+    backgroundColor: '#4A4E69',
+  },
+  switchButtonText: {
+    color: '#FFF',
+    fontSize: 16,
     fontWeight: 'bold',
   },
   navbar: {
