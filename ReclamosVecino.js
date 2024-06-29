@@ -1,26 +1,38 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Alert, Image, StyleSheet, StatusBar, Switch } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Image, StyleSheet, StatusBar, Switch, Modal } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 const ReclamosVecino = ({ route, navigation }) => {
   const [showMyReclamos, setShowMyReclamos] = useState(false);
   const [reclamos, setReclamos] = useState([]);
-
+  const [modalVisible, setModalVisible] = useState(false);
+  const [movimientosReclamo, setMovimientosReclamo] = useState([]);
   const { mail } = route.params || {};
 
   useEffect(() => {
-    if (showMyReclamos) {
-      fetch(`http://192.168.1.12:8080/inicio/misReclamosVecino?mail=${mail}`)
-        .then(response => response.json())
-        .then(data => setReclamos(data))
-        .catch(error => console.error('Error fetching mis reclamosPropios:', error));
-    } else {
-      fetch('http://192.168.1.12:8080/inicio/todosReclamos')
-        .then(response => response.json())
-        .then(data => setReclamos(data))
-        .catch(error => console.error('Error fetching reclamosMunicipio:', error));
-    }
+    fetchReclamos();
   }, [showMyReclamos, mail]);
+
+  const fetchReclamos = () => {
+    const endpoint = showMyReclamos
+      ? `http://192.168.1.12:8080/inicio/misReclamosVecino?mail=${mail}`
+      : 'http://192.168.1.12:8080/inicio/todosReclamos';
+
+    fetch(endpoint)
+      .then(response => response.json())
+      .then(data => setReclamos(data))
+      .catch(error => console.error('Error fetching reclamos:', error));
+  };
+
+  const fetchMovimientosReclamo = (idReclamo) => {
+    fetch(`http://192.168.1.12:8080/inicio/movimientosReclamo?idReclamo=${idReclamo}`)
+      .then(response => response.json())
+      .then(data => {
+        setMovimientosReclamo(data);
+        setModalVisible(true);
+      })
+      .catch(error => console.error('Error fetching movimientos de reclamo:', error));
+  };
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
@@ -29,7 +41,7 @@ const ReclamosVecino = ({ route, navigation }) => {
   }, [navigation]);
 
   const handleAddImage = () => {
-    // Functionality to add image
+    // Funcionalidad para agregar imagen
   };
 
   return (
@@ -46,7 +58,7 @@ const ReclamosVecino = ({ route, navigation }) => {
         <View style={styles.sectionTitleContainer}>
           <Text style={styles.sectionTitle}>Reclamos</Text>
         </View>
-        <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate('GenerarReclamoVecino',{mail})}>
+        <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate('GenerarReclamoVecino', { mail })}>
           <Text style={styles.buttonText}>Generar Reclamo</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.actionButton}>
@@ -76,12 +88,41 @@ const ReclamosVecino = ({ route, navigation }) => {
                 <Text style={styles.imageButtonText}>Agregar Imagen</Text>
               </TouchableOpacity>
             )}
-            <TouchableOpacity style={styles.movimientosButton}>
+            <TouchableOpacity style={styles.movimientosButton} onPress={() => fetchMovimientosReclamo(reclamo.idReclamo)}>
               <Text style={styles.movimientosButtonText}>Movimientos</Text>
             </TouchableOpacity>
           </View>
         ))}
       </ScrollView>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(false);
+        }}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalText}>Movimientos del Reclamo:</Text>
+            {movimientosReclamo.map((movimiento, index) => (
+              <View key={index} style={styles.movimientoContainer}>
+                <Text style={styles.modalText}><Text style={styles.boldText}>Causa:</Text> {movimiento.causa}</Text>
+                <Text style={styles.modalText}><Text style={styles.boldText}>Fecha:</Text> {new Date(movimiento.fecha).toLocaleString()}</Text>
+                <Text style={styles.modalText}><Text style={styles.boldText}>Responsable:</Text> {movimiento.responsable}</Text>
+              </View>
+            ))}
+            <TouchableOpacity
+              style={{ ...styles.openButton, backgroundColor: '#2196F3' }}
+              onPress={() => {
+                setModalVisible(!modalVisible);
+              }}
+            >
+              <Text style={styles.textStyle}>Cerrar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
       <View style={styles.navbar}>
         <TouchableOpacity style={styles.navButton} onPress={() => navigation.navigate('ServiciosVecino', { mail })}>
           <Image source={require('./assets/servicios.png')} style={styles.icon} />
@@ -170,13 +211,6 @@ const styles = StyleSheet.create({
     padding: 15,
     marginBottom: 20,
   },
-  reclamoImage: {
-    width: '100%',
-    height: 200,
-    resizeMode: 'cover',
-    borderRadius: 10,
-    marginBottom: 10,
-  },
   reclamoText: {
     color: '#FFF',
     marginBottom: 5,
@@ -225,6 +259,49 @@ const styles = StyleSheet.create({
   navText: {
     color: '#FFF',
     fontSize: 12,
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  openButton: {
+    backgroundColor: '#F194FF',
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2,
+    marginTop: 10,
+  },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+  boldText: {
+    fontWeight: 'bold',
+  },
+  movimientoContainer: {
+    marginBottom: 10,
   },
 });
 
