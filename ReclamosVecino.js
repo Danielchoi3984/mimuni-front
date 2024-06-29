@@ -7,7 +7,7 @@ const ReclamosVecino = ({ route, navigation }) => {
   const [reclamos, setReclamos] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [movimientosReclamo, setMovimientosReclamo] = useState([]);
-  const [imagenesReclamo, setImagenesReclamo] = useState([]);
+  const [imagenesReclamo, setImagenesReclamo] = useState({});
   const { mail } = route.params || {};
 
   useEffect(() => {
@@ -21,7 +21,12 @@ const ReclamosVecino = ({ route, navigation }) => {
 
     fetch(endpoint)
       .then(response => response.json())
-      .then(data => setReclamos(data))
+      .then(data => {
+        setReclamos(data);
+        data.forEach(reclamo => {
+          fetchImagenesReclamo(reclamo.idReclamo); // Llamar a la función para obtener imágenes
+        });
+      })
       .catch(error => console.error('Error fetching reclamos:', error));
   };
 
@@ -30,7 +35,6 @@ const ReclamosVecino = ({ route, navigation }) => {
       .then(response => response.json())
       .then(data => {
         setMovimientosReclamo(data);
-        fetchImagenesReclamo(idReclamo); // Llamar a la función para obtener imágenes
         setModalVisible(true);
       })
       .catch(error => console.error('Error fetching movimientos de reclamo:', error));
@@ -39,18 +43,29 @@ const ReclamosVecino = ({ route, navigation }) => {
   const fetchImagenesReclamo = (idReclamo) => {
     fetch(`http://192.168.1.12:8080/inicio/imagenesReclamo?idReclamo=${idReclamo}`)
       .then(response => response.json())
-      .then(data => setImagenesReclamo(data))
+      .then(data => {
+        setImagenesReclamo(prevState => ({
+          ...prevState,
+          [idReclamo]: data,
+        }));
+      })
       .catch(error => console.error('Error fetching imagenes de reclamo:', error));
   };
 
-  React.useLayoutEffect(() => {
-    navigation.setOptions({
-      headerShown: false,
-    });
-  }, [navigation]);
-
   const handleAddImage = () => {
-    // Funcionalidad para agregar imagen
+    // Lógica para agregar una imagen al reclamo
+    // Por ejemplo:
+    // uploadImageToServer()
+    //   .then(() => {
+    //     setImagenesReclamo({}); // Limpiar el estado de imágenes para forzar la recarga
+    //     fetchReclamos(); // Actualizar la lista de reclamos después de agregar la imagen
+    //   })
+    //   .catch(error => console.error('Error uploading image:', error));
+  };
+
+  const clearCacheAndFetchReclamos = () => {
+    setImagenesReclamo({}); // Limpiar el estado de imágenes para forzar la recarga
+    fetchReclamos(); // Actualizar la lista de reclamos después de limpiar la caché
   };
 
   return (
@@ -85,6 +100,17 @@ const ReclamosVecino = ({ route, navigation }) => {
         </View>
         {reclamos.map((reclamo) => (
           <View key={reclamo.idReclamo} style={styles.reclamoCard}>
+            <FlatList
+              horizontal
+              data={imagenesReclamo[reclamo.idReclamo] || []}
+              keyExtractor={(item, index) => index.toString()}
+              renderItem={({ item }) => (
+                <Image
+                  source={{ uri: item }}
+                  style={{ width: 200, height: 200, marginBottom: 10 }}
+                />
+              )}
+            />
             <Text style={styles.reclamoText}>ID: {reclamo.idReclamo}</Text>
             <Text style={styles.reclamoText}>Documento: {reclamo.documento}</Text>
             <Text style={styles.reclamoText}>Dirección: {reclamo.idSitio}</Text>
@@ -123,6 +149,7 @@ const ReclamosVecino = ({ route, navigation }) => {
             ))}
             <Text style={styles.modalText}>Imágenes del Reclamo:</Text>
             <FlatList
+              horizontal
               data={imagenesReclamo}
               keyExtractor={(item, index) => index.toString()}
               renderItem={({ item }) => (
@@ -168,118 +195,95 @@ const ReclamosVecino = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F2E9E4',
-    paddingTop: 0,
+    backgroundColor: '#fff',
   },
   header: {
-    backgroundColor: '#4A4E69',
-    paddingTop: 70,
-    paddingHorizontal: 15,
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-  },
-  headerTitle: {
-    color: '#FFFFFF',
-    fontSize: 30,
-    fontWeight: 'bold',
-    textAlign: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#3F51B5',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
   },
   backIcon: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    padding: 5,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: 'white',
   },
   scrollView: {
-    paddingHorizontal: 15,
-    paddingBottom: 60,
+    padding: 20,
   },
   sectionTitleContainer: {
-    alignItems: 'center',
-    marginBottom: 15,
-  },
-  sectionTitle: {
-    color: '#000',
-    fontWeight: 'bold',
-    fontSize: 24,
-  },
-  actionButton: {
-    backgroundColor: '#8C7D85',
-    padding: 15,
-    borderRadius: 10,
+    marginTop: 20,
     marginBottom: 10,
   },
-  buttonText: {
-    color: '#FFF',
+  sectionTitle: {
+    fontSize: 18,
     fontWeight: 'bold',
-    textAlign: 'center',
-    fontSize: 20,
   },
+  actionButton: {
+    backgroundColor: '#3F51B5',
+    padding: 15,
+    borderRadius: 5,
+    marginTop: 10,
+    alignItems: 'center',
+  },
+  
+  buttonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+
   switchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
+    marginTop: 10,
   },
+
   switchText: {
-    color: '#8C7D85',
-    fontWeight: 'bold',
     marginLeft: 10,
-    fontSize: 18,
+    fontSize: 16,
   },
   reclamoCard: {
-    backgroundColor: '#8C7D85',
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: '#CCCCCC',
+    borderRadius: 5,
+    padding: 10,
+    marginTop: 10,
   },
   reclamoText: {
-    color: '#FFF',
+    fontSize: 14,
     marginBottom: 5,
   },
   imageButton: {
-    backgroundColor: '#4A4E69',
+    backgroundColor: '#4CAF50',
     padding: 10,
     borderRadius: 5,
     marginTop: 10,
     alignItems: 'center',
   },
   imageButtonText: {
-    color: '#FFF',
+    color: 'white',
+    fontSize: 14,
     fontWeight: 'bold',
   },
   movimientosButton: {
-    backgroundColor: '#4A4E69',
+    backgroundColor: '#FF9800',
     padding: 10,
     borderRadius: 5,
     marginTop: 10,
     alignItems: 'center',
   },
   movimientosButtonText: {
-    color: '#FFF',
+    color: 'white',
+    fontSize: 14,
     fontWeight: 'bold',
   },
-  navbar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    backgroundColor: '#4A4E69',
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-  },
-  navButton: {
-    alignItems: 'center',
-  },
-  icon: {
-    width: 24,
-    height: 24,
-    marginBottom: 10,
-  },
-  navText: {
-    color: '#FFF',
-    fontSize: 12,
-  },
+
   centeredView: {
     flex: 1,
     justifyContent: 'center',
@@ -289,7 +293,7 @@ const styles = StyleSheet.create({
   modalView: {
     margin: 20,
     backgroundColor: 'white',
-    borderRadius: 20,
+    borderRadius: 10,
     padding: 35,
     alignItems: 'center',
     shadowColor: '#000',
@@ -301,9 +305,19 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
   },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'left',
+  },
+  boldText: {
+    fontWeight: 'bold',
+  },
+  movimientoContainer: {
+    marginBottom: 10,
+  },
   openButton: {
     backgroundColor: '#F194FF',
-    borderRadius: 20,
+    borderRadius: 5,
     padding: 10,
     elevation: 2,
     marginTop: 10,
@@ -313,15 +327,24 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
   },
-  modalText: {
-    marginBottom: 15,
-    textAlign: 'center',
+  navbar: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    backgroundColor: '#3F51B5',
+    paddingVertical: 10,
   },
-  boldText: {
-    fontWeight: 'bold',
+  navButton: {
+    alignItems: 'center',
   },
-  movimientoContainer: {
-    marginBottom: 10,
+  icon: {
+    width: 25,
+    height: 25,
+  },
+  navText: {
+    color: 'white',
+    fontSize: 12,
+    marginTop: 3,
   },
 });
 
