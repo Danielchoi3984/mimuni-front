@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Image, StyleSheet, StatusBar } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Image, StyleSheet, StatusBar, Alert } from 'react-native';
 import axios from 'axios';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -58,6 +58,14 @@ const ServiciosInspector = ({ route, navigation }) => {
     </View>
   );
 
+  const showAlert = () => {
+    Alert.alert(
+      'Acceso Restringido',
+      'Como inspector no puede realizar denuncias.',
+      [{ text: 'OK', onPress: () => console.log('OK Pressed') }]
+    );
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar />
@@ -104,7 +112,7 @@ const ServiciosInspector = ({ route, navigation }) => {
           <Image source={require('./assets/reclamos.png')} style={styles.icon} />
           <Text style={styles.navText}>Reclamos</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.navButton}>
+        <TouchableOpacity style={styles.navButton} onPress={() => showAlert()}>
           <Image source={require('./assets/denuncias.png')} style={styles.icon} />
           <Text style={styles.navText}>Denuncias</Text>
         </TouchableOpacity>
