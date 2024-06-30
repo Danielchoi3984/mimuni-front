@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet, TextInput, Button } from 'react-native';
+import { View, Text, TouchableOpacity, Image, StyleSheet, TextInput, Button, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
@@ -89,19 +89,21 @@ const GenerarServicio = ({ route, navigation }) => {
       </View>
 
       {/* Formulario de servicio seleccionado */}
-      <View style={styles.formContainer}>
-        <TextInput style={styles.input} placeholder="Dirección" value={direccion} onChangeText={setDireccion} />
-        {formType === 'profesional' && (
-          <TextInput style={styles.input} placeholder="Horario" value={medioContacto} onChangeText={setMedioContacto} />
-        )}
-        <TextInput style={styles.input} placeholder="Medio de contacto" value={medioContacto} onChangeText={setMedioContacto} />
-        <TextInput style={styles.input} placeholder="Descripción" multiline={true} maxLength={1000} value={descripcion} onChangeText={setDescripcion} />
-        <Button title="Seleccionar imágenes" onPress={pickImage} />
-        {fotos.map((foto, index) => (
-          <Image key={index} source={{ uri: foto }} style={styles.image} />
-        ))}
-        <Button title="Enviar formulario" onPress={submitForm} />
-      </View>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <View style={styles.formContainer}>
+          <TextInput style={styles.input} placeholder="Dirección" value={direccion} onChangeText={setDireccion} />
+          {formType === 'profesional' && (
+            <TextInput style={styles.input} placeholder="Horario" value={medioContacto} onChangeText={setMedioContacto} />
+          )}
+          <TextInput style={styles.input} placeholder="Medio de contacto" value={medioContacto} onChangeText={setMedioContacto} />
+          <TextInput style={styles.input} placeholder="Descripción" multiline={true} maxLength={1000} value={descripcion} onChangeText={setDescripcion} />
+          <Button title="Seleccionar imágenes" onPress={pickImage} />
+          {fotos.map((foto, index) => (
+            <Image key={index} source={{ uri: foto }} style={styles.image} />
+          ))}
+          <Button title="Enviar formulario" onPress={submitForm} />
+        </View>
+      </ScrollView>
 
       {/* Navegación inferior */}
       <View style={styles.navbar}>
@@ -171,11 +173,15 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
   },
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: 'space-between',
+  },
   formContainer: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
+    paddingBottom: 100, // Espacio adicional para el navbar fijo
   },
   input: {
     height: 40,
