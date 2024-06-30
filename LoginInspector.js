@@ -16,7 +16,7 @@ const LoginInspector = () => {
       return;
     }
 
-    const url = 'http://192.168.1.12:8080/inicio/loginInspector';
+    const url = 'http://192.168.0.241:8080/inicio/loginInspector';
 
     const formData = new FormData();
     formData.append('legajo', legajo);

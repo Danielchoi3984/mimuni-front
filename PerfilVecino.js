@@ -14,7 +14,7 @@ const PerfilVecino = ({ route, navigation }) => {
   useEffect(() => {
     const fetchPerfil = async () => {
       try {
-        const response = await axios.get(`http://192.168.1.12:8080/inicio/perfilVecino?mail=${mail}`);
+        const response = await axios.get(`http://192.168.0.241:8080/inicio/perfilVecino?mail=${mail}`);
         setPerfil(response.data);
       } catch (error) {
         console.error('Error fetching perfil:', error);

@@ -10,7 +10,7 @@ const OlvideContrasenia = ({ navigation }) => {
     const formData = new FormData();
     formData.append('mail', correo);
 
-    const url = "http://192.168.1.12:8080/inicio/vecino/olvidecontrasenia";
+    const url = "http://192.168.0.241:8080/inicio/vecino/olvidecontrasenia";
     axios.post(url, formData)
       .then(response => {
         const data = response.data;

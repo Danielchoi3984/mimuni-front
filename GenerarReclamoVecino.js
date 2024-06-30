@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Image, Text, View, StyleSheet, TouchableOpacity, Alert, TextInput, Modal, FlatList } from 'react-native';
+import { Button, Image, Text, View, StyleSheet, TouchableOpacity, Alert, TextInput, Modal, FlatList, StatusBar } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function GenerarReclamoVecino({ route, navigation }) {
   const [images, setImages] = useState([]);
@@ -21,7 +22,7 @@ export default function GenerarReclamoVecino({ route, navigation }) {
 
   const getSitios = async () => {
     try {
-      const response = await axios.get('http://192.168.1.12:8080/inicio/sitios');
+      const response = await axios.get('http://192.168.0.241:8080/inicio/sitios');
       setSitios(response.data);
     } catch (error) {
       console.error('Error al obtener sitios:', error);
@@ -31,7 +32,7 @@ export default function GenerarReclamoVecino({ route, navigation }) {
 
   const getDesperfectos = async () => {
     try {
-      const response = await axios.get('http://192.168.1.12:8080/inicio/todosLosDesperfectos');
+      const response = await axios.get('http://192.168.0.241:8080/inicio/todosLosDesperfectos');
       setDesperfectos(response.data);
     } catch (error) {
       console.error('Error al obtener desperfectos:', error);
@@ -107,7 +108,7 @@ export default function GenerarReclamoVecino({ route, navigation }) {
         });
       });
 
-      const response = await axios.post('http://192.168.1.12:8080/inicio/generarReclamoVecino', formData, {
+      const response = await axios.post('http://192.168.0.241:8080/inicio/generarReclamoVecino', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -132,24 +133,36 @@ export default function GenerarReclamoVecino({ route, navigation }) {
 
   return (
     <View style={styles.container}>
-      <TextInput
-        style={styles.input}
-        placeholder="Descripción"
-        value={descripcion}
-        onChangeText={setDescripcion}
-      />
-      <TouchableOpacity style={styles.input} onPress={handleIdSitioPress}>
-        <Text>{idSitio ? `Sitio ID: ${idSitio}` : 'Seleccionar Sitio'}</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.input} onPress={handleIdDesperfectoPress}>
-        <Text>{idDesperfecto ? `Desperfecto ID: ${idDesperfecto}` : 'Seleccionar Desperfecto'}</Text>
-      </TouchableOpacity>
-      <Button title="Seleccionar imagen de la galería" onPress={pickImage} />
-      <Button title="Tomar una foto" onPress={takePhoto} />
-      <Button title="Subir imágenes" onPress={uploadImages} />
-      {images.map((image, index) => (
-        <Image key={index} source={{ uri: image.uri }} style={styles.image} />
-      ))}
+      <StatusBar />
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.backIcon} onPress={() => navigation.goBack()}>
+          <Ionicons name="arrow-back" size={24} color="white" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>MiMuni</Text>
+        <View style={{ width: 20 }}></View>
+      </View>
+
+      <View style={styles.content}>
+        <TextInput
+          style={styles.input}
+          placeholder="Descripción"
+          value={descripcion}
+          onChangeText={setDescripcion}
+        />
+        <TouchableOpacity style={styles.input} onPress={handleIdSitioPress}>
+          <Text>{idSitio ? `Sitio ID: ${idSitio}` : 'Seleccionar Sitio'}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.input} onPress={handleIdDesperfectoPress}>
+          <Text>{idDesperfecto ? `Desperfecto ID: ${idDesperfecto}` : 'Seleccionar Desperfecto'}</Text>
+        </TouchableOpacity>
+        <Button title="Seleccionar imagen de la galería" onPress={pickImage} />
+        <Button title="Tomar una foto" onPress={takePhoto} />
+        <Button title="Subir imágenes" onPress={uploadImages} />
+        {images.map((image, index) => (
+          <Image key={index} source={{ uri: image.uri }} style={styles.image} />
+        ))}
+      </View>
+
       <Modal
         animationType="slide"
         transparent={true}
@@ -203,8 +216,30 @@ export default function GenerarReclamoVecino({ route, navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#F2E9E4',
+  },
+  header: {
+    backgroundColor: '#4A4E69',
+    paddingTop: 70,
+    paddingHorizontal: 15,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  headerTitle: {
+    color: '#FFFFFF',
+    fontSize: 30,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  backIcon: {
     justifyContent: 'center',
+    alignItems: 'center',
+  },
+  content: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   input: {
     height: 40,
@@ -221,7 +256,8 @@ const styles = StyleSheet.create({
   },
   navbar: {
     flexDirection: 'row',
-    backgroundColor: '#333',
+    justifyContent: 'space-between',
+    backgroundColor: '#4A4E69',
     paddingHorizontal: 15,
     paddingVertical: 10,
     position: 'absolute',
@@ -238,7 +274,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   navText: {
-    color: 'white',
+    color: '#FFF',
     fontSize: 12,
   },
   centeredView: {
@@ -270,28 +306,5 @@ const styles = StyleSheet.create({
   },
   sitioItem: {
     marginVertical: 10,
-  },
-  navbar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    backgroundColor: '#4A4E69',
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-  },
-  navButton: {
-    alignItems: 'center',
-  },
-  icon: {
-    width: 24,
-    height: 24,
-    marginBottom: 10,
-  },
-  navText: {
-    color: '#FFF',
-    fontSize: 12,
   },
 });

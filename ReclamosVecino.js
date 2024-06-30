@@ -16,8 +16,8 @@ const ReclamosVecino = ({ route, navigation }) => {
 
   const fetchReclamos = () => {
     const endpoint = showMyReclamos
-      ? `http://192.168.1.12:8080/inicio/misReclamosVecino?mail=${mail}`
-      : 'http://192.168.1.12:8080/inicio/todosReclamos';
+      ? `http://192.168.0.241:8080/inicio/misReclamosVecino?mail=${mail}`
+      : 'http://192.168.0.241:8080/inicio/todosReclamos';
 
     fetch(endpoint)
       .then(response => response.json())
@@ -31,7 +31,7 @@ const ReclamosVecino = ({ route, navigation }) => {
   };
 
   const fetchMovimientosReclamo = (idReclamo) => {
-    fetch(`http://192.168.1.12:8080/inicio/movimientosReclamo?idReclamo=${idReclamo}`)
+    fetch(`http://192.168.0.241:8080/inicio/movimientosReclamo?idReclamo=${idReclamo}`)
       .then(response => response.json())
       .then(data => {
         setMovimientosReclamo(data);
@@ -41,7 +41,7 @@ const ReclamosVecino = ({ route, navigation }) => {
   };
 
   const fetchImagenesReclamo = (idReclamo) => {
-    fetch(`http://192.168.1.12:8080/inicio/imagenesReclamo?idReclamo=${idReclamo}`)
+    fetch(`http://192.168.0.241:8080/inicio/imagenesReclamo?idReclamo=${idReclamo}`)
       .then(response => response.json())
       .then(data => {
         setImagenesReclamo(prevState => ({
@@ -175,15 +175,19 @@ const ReclamosVecino = ({ route, navigation }) => {
           <Image source={require('./assets/servicios.png')} style={styles.icon} />
           <Text style={styles.navText}>Servicios</Text>
         </TouchableOpacity>
+
         <TouchableOpacity style={styles.navButton} onPress={() => navigation.navigate('ReclamosVecino', { mail })}>
-          <Image source={require('./assets/reclamos.png')} style={styles.icon} />
-          <Text style={styles.navText}>Reclamos</Text>
+        <Image source={require('./assets/reclamos.png')} style={styles.icon} />
+        <Text style={styles.navText}>Reclamos</Text>
         </TouchableOpacity>
+
         <TouchableOpacity style={styles.navButton}>
           <Image source={require('./assets/denuncias.png')} style={styles.icon} />
           <Text style={styles.navText}>Denuncias</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.navButton} onPress={() => navigation.navigate('PerfilVecino', { mail })}>
+
+        <TouchableOpacity 
+          style={styles.navButton} onPress={() => navigation.navigate('PerfilVecino', { mail })} >
           <Image source={require('./assets/perfil.png')} style={styles.icon} />
           <Text style={styles.navText}>Perfil</Text>
         </TouchableOpacity>
@@ -195,23 +199,26 @@ const ReclamosVecino = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#F2E9E4',
+    paddingTop: 0,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#3F51B5',
-    paddingVertical: 10,
+    backgroundColor: '#4A4E69',
+    paddingTop: 70,
     paddingHorizontal: 15,
-  },
-  backIcon: {
-    padding: 5,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   headerTitle: {
-    fontSize: 20,
+    color: '#FFFFFF',
+    fontSize: 30,
     fontWeight: 'bold',
-    color: 'white',
+    textAlign: 'center',
+  },
+  backIcon: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   scrollView: {
     padding: 20,
@@ -329,22 +336,33 @@ const styles = StyleSheet.create({
   },
   navbar: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    backgroundColor: '#3F51B5',
+    justifyContent: 'space-between',
+    backgroundColor: '#4A4E69',
+    paddingHorizontal: 15,
     paddingVertical: 10,
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
   },
   navButton: {
     alignItems: 'center',
   },
   icon: {
-    width: 25,
-    height: 25,
+    width: 24,
+    height: 24,
+    marginBottom: 10,
   },
   navText: {
-    color: 'white',
+    color: '#FFF',
     fontSize: 12,
-    marginTop: 3,
+  },
+  cardImage: {
+    width: '100%',
+    height: 200,
+    resizeMode: 'cover',
+    borderRadius: 10,
+    marginBottom: 10,
   },
 });
 

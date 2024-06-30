@@ -28,7 +28,7 @@ const ServiciosScreen = ({ navigation }) => {
   useEffect(() => {
     const fetchServiciosComercios = async () => {
       try {
-        const response = await axios.get("http://192.168.1.12:8080/inicio/servicios/comercios");
+        const response = await axios.get("http://192.168.0.241:8080/inicio/servicios/comercios");
         setServiciosComercios(response.data);
       } catch (error) {
         console.error("Error fetching comercios:", error);
@@ -37,7 +37,7 @@ const ServiciosScreen = ({ navigation }) => {
 
     const fetchServiciosProfesionales = async () => {
       try {
-        const response = await axios.get("http://192.168.1.12:8080/inicio/servicios/profesionales");
+        const response = await axios.get("http://192.168.0.241:8080/inicio/servicios/profesionales");
         setServiciosProfesionales(response.data);
       } catch (error) {
         console.error("Error fetching profesionales:", error);

@@ -14,7 +14,7 @@ const LoginVecino = ({ navigation }) => {
       return;
     }
 
-    const url = 'http://192.168.1.12:8080/inicio/loginVecino';
+    const url = 'http://192.168.0.241:8080/inicio/loginVecino';
 
     const formData = new FormData();
     formData.append('mail', mail);

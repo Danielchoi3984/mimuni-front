@@ -14,7 +14,7 @@ const Registrarme = ({ navigation }) => {
     formData.append('documento', documento);
     formData.append('mail', correo);
 
-    const url = 'http://192.168.1.12:8080/inicio/register';
+    const url = 'http://192.168.0.241:8080/inicio/register';
     axios.post(url, formData)
       .then(response => {
         const data = response.data; // Aquí obtenemos los datos de la respuesta
