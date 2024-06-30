@@ -8,7 +8,6 @@ const ServiciosInspector = ({ route, navigation }) => {
   const [serviciosComercios, setServiciosComercios] = useState([]);
   const [serviciosProfesionales, setServiciosProfesionales] = useState([]);
   const [showComercios, setShowComercios] = useState(true);
-
   useEffect(() => {
     const fetchServiciosComercios = async () => {
       try {
@@ -108,7 +107,7 @@ const ServiciosInspector = ({ route, navigation }) => {
           <Image source={require('./assets/servicios.png')} style={styles.icon} />
           <Text style={styles.navText}>Servicios</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.navButton}>
+        <TouchableOpacity style={styles.navButton}onPress={() => navigation.navigate('ReclamosInspector', { legajo })}>
           <Image source={require('./assets/reclamos.png')} style={styles.icon} />
           <Text style={styles.navText}>Reclamos</Text>
         </TouchableOpacity>

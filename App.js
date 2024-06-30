@@ -19,6 +19,8 @@ import ReclamosVecino from "./ReclamosVecino";
 import GenerarReclamoVecino from "./GenerarReclamoVecino";
 import DenunciasVecino from "./DenunciasVecino";
 import GenerarDenuncia from "./GenerarDenuncia";
+import ReclamosInspector from "./ReclamosInspector";
+import GenerarReclamoInspector from "./GenerarReclamoInspector";
 
 const Stack = createStackNavigator();
 
@@ -211,6 +213,16 @@ export default function App() {
           component={GenerarDenuncia}
           options={{ headerShown: false }}
         />
+        <Stack.Screen
+        name="ReclamosInspector"
+        component={ReclamosInspector}
+        options={{ headerShown: false }}
+      />
+        <Stack.Screen
+        name="GenerarReclamoInspector"
+        component={GenerarReclamoInspector}
+        options={{ headerShown: false }}
+      />
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -66,6 +66,13 @@ const PerfilInspector = ({ route, navigation }) => {
     );
   }
 
+  const showAlert = () => {
+    Alert.alert(
+      'Acceso Restringido',
+      'Como inspector no puede realizar denuncias.',
+      [{ text: 'OK', onPress: () => console.log('OK Pressed') }]
+    );
+  };
   return (
     <View style={styles.container}>
       <StatusBar/>
@@ -139,11 +146,11 @@ const PerfilInspector = ({ route, navigation }) => {
           <Image source={require('./assets/servicios.png')} style={styles.icon} />
           <Text style={styles.navText}>Servicios</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.navButton}>
+        <TouchableOpacity style={styles.navButton}onPress={() => navigation.navigate('ReclamosInspector', { legajo })}>
           <Image source={require('./assets/reclamos.png')} style={styles.icon} />
           <Text style={styles.navText}>Reclamos</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.navButton}>
+        <TouchableOpacity style={styles.navButton} onPress={() => showAlert()}>
           <Image source={require('./assets/denuncias.png')} style={styles.icon} />
           <Text style={styles.navText}>Denuncias</Text>
         </TouchableOpacity>
