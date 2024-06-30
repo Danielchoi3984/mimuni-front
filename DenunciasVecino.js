@@ -3,35 +3,46 @@ import { View, Text, ScrollView, TouchableOpacity, Image, Alert, StyleSheet, Sta
 import axios from 'axios';
 import { Ionicons } from '@expo/vector-icons';
 
-const ServiciosVecino = ({ route, navigation }) => {
-  const [serviciosComercios, setServiciosComercios] = useState([]);
-  const [serviciosProfesionales, setServiciosProfesionales] = useState([]);
-  const [showComercios, setShowComercios] = useState(true);
+const DenunciasVecino = ({ route, navigation }) => {
+  const [denunciasRecibidas, setDenunciasRecibidas] = useState([]);
+  const [denunciasRealizadas, setDenunciasRealizadas] = useState([]);
+  const [misDenuncias, setMisDenuncias] = useState([]);
+  const [showRecibidas, setShowRecibidas] = useState(true);
 
   const { mail } = route.params || {};
 
   useEffect(() => {
-    const fetchServiciosComercios = async () => {
+    const fetchDenunciasRecibidas = async () => {
       try {
-        const response = await axios.get('http://192.168.0.241:8080/inicio/servicios/comercios');
-        setServiciosComercios(response.data);
+        const response = await axios.get(`http://192.168.0.241:8080/inicio/denunciasRecibidas?mail=${mail}`);
+        setDenunciasRecibidas(response.data);
       } catch (error) {
-        console.error('Error fetching comercios:', error);
+        console.error('Error fetching denuncias recibidas:', error);
       }
     };
 
-    const fetchServiciosProfesionales = async () => {
+    const fetchDenunciasRealizadas = async () => {
       try {
-        const response = await axios.get('http://192.168.0.241:8080/inicio/servicios/profesionales');
-        setServiciosProfesionales(response.data);
+        const response = await axios.get(`http://192.168.0.241:8080/inicio/denunciasRealizadas?mail=${mail}`);
+        setDenunciasRealizadas(response.data);
       } catch (error) {
-        console.error('Error fetching profesionales:', error);
+        console.error('Error fetching denuncias realizadas:', error);
       }
     };
 
-    fetchServiciosComercios();
-    fetchServiciosProfesionales();
-  }, []);
+    const fetchMisDenuncias = async () => {
+      try {
+        const response = await axios.get(`http://192.168.0.241:8080/inicio/denuncias/misDenuncias?mail=${mail}`);
+        setMisDenuncias(response.data);
+      } catch (error) {
+        {/*console.error('Error fetching mis denuncias:', error);*/}
+      }
+    };
+
+    fetchDenunciasRecibidas();
+    fetchDenunciasRealizadas();
+    fetchMisDenuncias();
+  }, [mail]);
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
@@ -39,23 +50,22 @@ const ServiciosVecino = ({ route, navigation }) => {
     });
   }, [navigation]);
 
-  const renderCard = (servicio, index) => (
+  const renderCard = (denuncia, index) => (
     <View key={index} style={styles.card}>
       <Image source={require('./assets/luzRota.jpeg')} style={styles.cardImage} />
-      {servicio.nombre !== undefined && (
+      {denuncia.titulo !== undefined && (
         <View style={{ flexDirection: "column" }}>
-          <Text style={styles.cardText}><Text style={styles.boldText}>Responsable:</Text> {servicio.apellido + " " + servicio.nombre}</Text>
-          <Text style={styles.cardText}><Text style={styles.boldText}>Horario:</Text> {servicio.horario}</Text>
-          <Text style={styles.cardText}><Text style={styles.boldText}>Rubro:</Text> {servicio.rubro}</Text>
+          <Text style={styles.cardText}><Text style={styles.boldText}>Título:</Text> {denuncia.titulo}</Text>
+          <Text style={styles.cardText}><Text style={styles.boldText}>Fecha:</Text> {denuncia.fecha}</Text>
+          <Text style={styles.cardText}><Text style={styles.boldText}>Estado:</Text> {denuncia.estado}</Text>
         </View>
       )}
-      {servicio.direccion !== undefined && (
+      {denuncia.descripcion !== undefined && (
         <View style={{ flexDirection: "column" }}>
-          <Text style={styles.cardText}><Text style={styles.boldText}>Dirección:</Text> {servicio.direccion}</Text>
+          <Text style={styles.cardText}><Text style={styles.boldText}>Descripción:</Text> {denuncia.descripcion}</Text>
         </View>
       )}
-      <Text style={styles.cardText}><Text style={styles.boldText}>Contacto:</Text> {servicio.contacto}</Text>
-      <Text style={styles.cardText}><Text style={styles.boldText}>Descripción:</Text> {servicio.descripcion}</Text>
+      <Text style={styles.cardText}><Text style={styles.boldText}>Ubicación:</Text> {denuncia.ubicacion}</Text>
     </View>
   );
 
@@ -73,42 +83,41 @@ const ServiciosVecino = ({ route, navigation }) => {
         <View style={styles.buttonContainer}>
           <TouchableOpacity 
             style={styles.actionButton} 
-            onPress={() => navigation.navigate('GenerarServicio', { mail })}
+            onPress={() => navigation.navigate('GenerarDenuncia', { mail })}
           >
             <Ionicons name="add" size={24} color="white" style={styles.buttonIcon} />
-            <Text style={styles.buttonText}>Generar Servicio</Text>
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={styles.actionButton} 
-            onPress={() => navigation.navigate('EliminarServicio', { mail })}
-          >
-            <Ionicons name="close" size={24} color="white" style={styles.buttonIcon} />
-            <Text style={styles.buttonText}>Eliminar Servicio</Text>
+            <Text style={styles.buttonText}>Generar Denuncia</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.switchContainer}>
           <TouchableOpacity
-            style={[styles.switchButton, showComercios ? styles.activeButton : null]}
-            onPress={() => setShowComercios(true)}
+            style={[styles.switchButton, showRecibidas ? styles.activeButton : null]}
+            onPress={() => setShowRecibidas(true)}
           >
-            <Text style={styles.switchButtonText}>Comercios</Text>
+            <Text style={styles.switchButtonText}>Recibidas</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.switchButton, !showComercios ? styles.activeButton : null]}
-            onPress={() => setShowComercios(false)}
+            style={[styles.switchButton, !showRecibidas ? styles.activeButton : null]}
+            onPress={() => setShowRecibidas(false)}
           >
-            <Text style={styles.switchButtonText}>Profesionales</Text>
+            <Text style={styles.switchButtonText}>Realizadas</Text>
           </TouchableOpacity>
         </View>
-        {showComercios ? (
+        {showRecibidas ? (
           <>
-            <Text style={styles.subtitle}>Comercios</Text>
-            {serviciosComercios.map((servicio, index) => renderCard(servicio, index))}
+            <Text style={styles.subtitle}>Denuncias Recibidas</Text>
+            {denunciasRecibidas.map((denuncia, index) => renderCard(denuncia, index))}
           </>
         ) : (
           <>
-            <Text style={styles.subtitle}>Profesionales</Text>
-            {serviciosProfesionales.map((servicio, index) => renderCard(servicio, index))}
+            <Text style={styles.subtitle}>Mis Denuncias</Text>
+            {misDenuncias.map((denuncia, index) => renderCard(denuncia, index))}
+          </>
+        )}
+        {!showRecibidas && (
+          <>
+            <Text style={styles.subtitle}>Denuncias Realizadas</Text>
+            {denunciasRealizadas.map((denuncia, index) => renderCard(denuncia, index))}
           </>
         )}
       </ScrollView>
@@ -119,11 +128,11 @@ const ServiciosVecino = ({ route, navigation }) => {
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.navButton} onPress={() => navigation.navigate('ReclamosVecino', { mail })}>
-        <Image source={require('./assets/reclamos.png')} style={styles.icon} />
-        <Text style={styles.navText}>Reclamos</Text>
+          <Image source={require('./assets/reclamos.png')} style={styles.icon} />
+          <Text style={styles.navText}>Reclamos</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.navButton} onPress={() => navigation.navigate('DenunciasVecino', { mail })}>
+        <TouchableOpacity style={styles.navButton}>
           <Image source={require('./assets/denuncias.png')} style={styles.icon} />
           <Text style={styles.navText}>Denuncias</Text>
         </TouchableOpacity>
@@ -255,4 +264,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ServiciosVecino;
+export default DenunciasVecino;

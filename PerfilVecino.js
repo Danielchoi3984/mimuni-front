@@ -141,7 +141,7 @@ const PerfilVecino = ({ route, navigation }) => {
           <Image source={require('./assets/reclamos.png')} style={styles.icon} />
           <Text style={styles.navText}>Reclamos</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.navButton}>
+        <TouchableOpacity style={styles.navButton} onPress={() => navigation.navigate('DenunciasVecino', { mail })}>
           <Image source={require('./assets/denuncias.png')} style={styles.icon} />
           <Text style={styles.navText}>Denuncias</Text>
         </TouchableOpacity>
