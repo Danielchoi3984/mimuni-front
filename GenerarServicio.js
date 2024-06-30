@@ -98,9 +98,7 @@ const GenerarServicio = ({ route, navigation }) => {
           <TextInput style={styles.input} placeholder="Medio de contacto" value={medioContacto} onChangeText={setMedioContacto} />
           <TextInput style={styles.input} placeholder="Descripción" multiline={true} maxLength={1000} value={descripcion} onChangeText={setDescripcion} />
           <Button title="Seleccionar imágenes" onPress={pickImage} />
-          {fotos.map((foto, index) => (
-            <Image key={index} source={{ uri: foto }} style={styles.image} />
-          ))}
+          
           <Button title="Enviar formulario" onPress={submitForm} />
         </View>
       </ScrollView>
@@ -191,10 +189,17 @@ const styles = StyleSheet.create({
     padding: 10,
     width: '100%',
   },
+  imageContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
   image: {
-    width: 200,
-    height: 200,
-    marginVertical: 10,
+    width: 100,
+    height: 100,
+    margin: 5,
   },
   navbar: {
     flexDirection: 'row',
