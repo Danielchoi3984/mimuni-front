@@ -9,7 +9,6 @@ const PerfilVecino = ({ route, navigation }) => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
   const { mail } = route.params || {};
-  Alert.alert("El mail es: " + mail);
 
   useEffect(() => {
     const fetchPerfil = async () => {
@@ -72,8 +71,8 @@ const PerfilVecino = ({ route, navigation }) => {
         <TouchableOpacity style={styles.backIcon} onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={24} color="white" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Mimuni</Text>
-        <Ionicons name="mail" size={24} color="white" />
+        <Text style={styles.headerTitle}>MiMuni</Text>
+        <View style={{ width: 20 }}></View>
       </View>
       <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
         <Text style={styles.title}>Datos Personales</Text>
@@ -242,10 +241,10 @@ const styles = StyleSheet.create({
   },
   navbar: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'space-around', // Changed from 'space-between' to 'space-around' to reduce space between buttons
     backgroundColor: '#4A4E69',
-    paddingHorizontal: 15,
-    paddingVertical: 10,
+    paddingHorizontal: 10, // Reduced paddingHorizontal to make buttons closer
+    paddingVertical: 20, // Increased padding vertical to make the navbar larger
     position: 'absolute',
     bottom: 0,
     left: 0,
@@ -255,13 +254,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   icon: {
-    width: 24,
-    height: 24,
-    marginBottom: 10,
+    width: 25, // Increased icon size
+    height: 25, // Increased icon size
+    marginBottom: 5, // Reduced marginBottom to make buttons closer
   },
   navText: {
     color: 'white',
-    fontSize: 12,
+    fontSize: 14, // Increased font size for better visibility
   },
 });
 
