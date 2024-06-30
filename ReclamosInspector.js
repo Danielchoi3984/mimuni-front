@@ -112,7 +112,7 @@ const ReclamosInspector = ({ route, navigation }) => {
                 renderItem={({ item }) => (
                   <Image
                     source={{ uri: item }}
-                    style={{ width: 200, height: 200, marginBottom: 10 }}
+                    style={{ width: 100, height: 100, marginBottom: 10 }}
                   />
                 )}
                 ListEmptyComponent={() => (
@@ -162,17 +162,7 @@ const ReclamosInspector = ({ route, navigation }) => {
               </View>
             ))}
             <Text style={styles.modalText}>Imágenes del Reclamo:</Text>
-            <FlatList
-              horizontal
-              data={imagenesReclamo}
-              keyExtractor={(item, index) => index.toString()}
-              renderItem={({ item }) => (
-                <Image
-                  source={{ uri: item }}
-                  style={{ width: 200, height: 200, marginBottom: 10 }}
-                />
-              )}
-            />
+            
             <TouchableOpacity
               style={{ ...styles.openButton, backgroundColor: '#2196F3' }}
               onPress={() => {
@@ -214,6 +204,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F2E9E4',
     paddingTop: 0,
+    paddingBottom: 80, 
   },
   header: {
     backgroundColor: '#4A4E69',
@@ -342,6 +333,11 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     textAlign: 'center',
+  },
+  cardImage: {
+    width: 200,
+    height: 200,
+    marginBottom: 10,
   },
   modalText: {
     marginBottom: 15,

@@ -12,7 +12,7 @@ const GenerarDenuncia = ({ route, navigation }) => {
   const [sitios, setSitios] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const { mail } = route.params || {};
-
+  
   useEffect(() => {
     getSitios();
   }, []);
@@ -65,32 +65,33 @@ const GenerarDenuncia = ({ route, navigation }) => {
   const handleSubmit = async () => {
     try {
       const formData = new FormData();
-      formData.append('documento', documento);
-      formData.append('sitio', sitio);
+      formData.append('mail', mail);
+      formData.append('dniDenunciado', documento);
+      formData.append('idSitio', sitio);
       formData.append('descripcion', descripcion);
-      formData.append('mail', mail); // Agregar el correo electrónico aquí
       fotos.forEach((foto, index) => {
-        formData.append(`foto${index}`, {
+        formData.append('files', {
           uri: foto,
           name: `foto${index}.jpg`,
           type: 'image/jpeg',
         });
       });
-
-      const response = await axios.post('http://192.168.0.241:8080/inicio/crearDenuncia', formData, {
+  
+      const response = await axios.post('http://localhost:8080/inicio/crearDenuncia', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
-
+  
       console.log('Respuesta del servidor:', response.data);
-
+  
       setDocumento('');
       setSitio('');
       setDescripcion('');
       setFotos([]);
     } catch (error) {
       console.error('Error al enviar la denuncia:', error);
+      Alert.alert('Error', `Error al enviar la denuncia: ${error.message}`);
     }
   };
 

@@ -22,12 +22,19 @@ const ReclamosVecino = ({ route, navigation }) => {
     fetch(endpoint)
       .then(response => response.json())
       .then(data => {
-        setReclamos(data);
-        data.forEach(reclamo => {
-          fetchImagenesReclamo(reclamo.idReclamo); // Llamar a la función para obtener imágenes
-        });
+        if (Array.isArray(data)) {
+          setReclamos(data);
+          data.forEach(reclamo => {
+            fetchImagenesReclamo(reclamo.idReclamo); // Llamar a la función para obtener imágenes
+          });
+        } else {
+          setReclamos([]);
+        }
       })
-      .catch(error => console.error('Error fetching reclamos:', error));
+      .catch(error => {
+        console.error('Error fetching reclamos:', error);
+        setReclamos([]);
+      });
   };
 
   const fetchMovimientosReclamo = (idReclamo) => {
@@ -98,7 +105,7 @@ const ReclamosVecino = ({ route, navigation }) => {
           />
           <Text style={styles.switchText}>Ver mis reclamos</Text>
         </View>
-        {reclamos.map((reclamo) => (
+        {Array.isArray(reclamos) && reclamos.map((reclamo) => (
           <View key={reclamo.idReclamo} style={styles.reclamoCard}>
             <FlatList
               horizontal
@@ -147,18 +154,7 @@ const ReclamosVecino = ({ route, navigation }) => {
                 <Text style={styles.modalText}><Text style={styles.boldText}>Responsable:</Text> {movimiento.responsable}</Text>
               </View>
             ))}
-            <Text style={styles.modalText}>Imágenes del Reclamo:</Text>
-            <FlatList
-              horizontal
-              data={imagenesReclamo}
-              keyExtractor={(item, index) => index.toString()}
-              renderItem={({ item }) => (
-                <Image
-                  source={{ uri: item }}
-                  style={{ width: 200, height: 200, marginBottom: 10 }}
-                />
-              )}
-            />
+            
             <TouchableOpacity
               style={{ ...styles.openButton, backgroundColor: '#2196F3' }}
               onPress={() => {
@@ -201,6 +197,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F2E9E4',
     paddingTop: 0,
+    paddingBottom: 80, 
   },
   header: {
     backgroundColor: '#4A4E69',

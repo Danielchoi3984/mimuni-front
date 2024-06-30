@@ -10,7 +10,7 @@ const DenunciasVecino = ({ route, navigation }) => {
   const [showRecibidas, setShowRecibidas] = useState(true);
 
   const { mail } = route.params || {};
-
+  
   useEffect(() => {
     const fetchDenunciasRecibidas = async () => {
       try {
