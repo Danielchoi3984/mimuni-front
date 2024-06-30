@@ -73,14 +73,14 @@ const ServiciosVecino = ({ route, navigation }) => {
         <View style={styles.buttonContainer}>
           <TouchableOpacity 
             style={styles.actionButton} 
-            onPress={() => navigation.navigate('GenerarServicio')}
+            onPress={() => navigation.navigate('GenerarServicio', { mail })}
           >
             <Ionicons name="add" size={24} color="white" style={styles.buttonIcon} />
             <Text style={styles.buttonText}>Generar Servicio</Text>
           </TouchableOpacity>
           <TouchableOpacity 
             style={styles.actionButton} 
-            onPress={() => navigation.navigate('EliminarServicio')}
+            onPress={() => navigation.navigate('EliminarServicio', { mail })}
           >
             <Ionicons name="close" size={24} color="white" style={styles.buttonIcon} />
             <Text style={styles.buttonText}>Eliminar Servicio</Text>

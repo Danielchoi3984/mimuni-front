@@ -1,10 +1,75 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, Image, StyleSheet, TextInput, Button } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
+import axios from 'axios';
 
-const GenerarServicio = ({ navigation }) => {
+const GenerarServicio = ({ route, navigation }) => {
+  const [formType, setFormType] = useState('comercio');
+  const [direccion, setDireccion] = useState('');
+  const [medioContacto, setMedioContacto] = useState('');
+  const [descripcion, setDescripcion] = useState('');
+  const [fotos, setFotos] = useState([]);
+
+  const { mail } = route.params || {};
+
+  // Función para seleccionar imágenes desde la galería
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.cancelled) {
+      setFotos([...fotos, result.uri]);
+    }
+  };
+
+  // Función para subir el formulario de comercio o profesional
+  const submitForm = async () => {
+    try {
+      const formData = new FormData();
+      formData.append('mail', mail);
+      formData.append('descripcion', descripcion);
+
+      if (formType === 'comercio') {
+        formData.append('direccion', direccion);
+        formData.append('contacto', medioContacto);
+      } else if (formType === 'profesional') {
+        formData.append('medioContacto', medioContacto);
+        formData.append('horario', medioContacto); // Ajustar según sea necesario
+        formData.append('rubro', 'EjemploRubro'); // Ajustar según sea necesario
+      }
+
+      fotos.forEach((foto, index) => {
+        formData.append('files', {
+          uri: foto,
+          name: `foto_${index}.jpg`,
+          type: 'image/jpeg',
+        });
+      });
+
+      const url = formType === 'comercio' ? 'http://192.168.0.241:8080/inicio/crearServicioComercio' : 'http://192.168.0.241:8080/inicio/crearServicioProfesional';
+      const response = await axios.post(url, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      console.log('Respuesta de subida:', response.data);
+      // Manejar la respuesta del servidor según sea necesario
+
+    } catch (error) {
+      console.error('Error al subir el formulario:', error);
+      // Manejar errores aquí
+    }
+  };
+
   return (
     <View style={styles.container}>
+      {/* Encabezado y botones de navegación */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.backIcon} onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={24} color="white" />
@@ -12,7 +77,33 @@ const GenerarServicio = ({ navigation }) => {
         <Text style={styles.headerTitle}>Mimuni</Text>
         <View style={{ width: 20 }}></View>
       </View>
-      <Text style={styles.title}>Generar Servicio</Text>
+
+      {/* Botones para seleccionar tipo de formulario */}
+      <View style={styles.toggleButtons}>
+        <TouchableOpacity style={[styles.toggleButton, formType === 'comercio' && styles.activeButton]} onPress={() => setFormType('comercio')}>
+          <Text style={formType === 'comercio' ? styles.activeButtonText : styles.buttonText}>Servicio Comercio</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={[styles.toggleButton, formType === 'profesional' && styles.activeButton]} onPress={() => setFormType('profesional')}>
+          <Text style={formType === 'profesional' ? styles.activeButtonText : styles.buttonText}>Servicio Profesional</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Formulario de servicio seleccionado */}
+      <View style={styles.formContainer}>
+        <TextInput style={styles.input} placeholder="Dirección" value={direccion} onChangeText={setDireccion} />
+        {formType === 'profesional' && (
+          <TextInput style={styles.input} placeholder="Horario" value={medioContacto} onChangeText={setMedioContacto} />
+        )}
+        <TextInput style={styles.input} placeholder="Medio de contacto" value={medioContacto} onChangeText={setMedioContacto} />
+        <TextInput style={styles.input} placeholder="Descripción" multiline={true} maxLength={1000} value={descripcion} onChangeText={setDescripcion} />
+        <Button title="Seleccionar imágenes" onPress={pickImage} />
+        {fotos.map((foto, index) => (
+          <Image key={index} source={{ uri: foto }} style={styles.image} />
+        ))}
+        <Button title="Enviar formulario" onPress={submitForm} />
+      </View>
+
+      {/* Navegación inferior */}
       <View style={styles.navbar}>
         <TouchableOpacity style={styles.navButton} onPress={() => navigation.navigate('ServiciosVecino', { mail })}>
           <Image source={require('./assets/servicios.png')} style={styles.icon} />
@@ -39,7 +130,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F2E9E4',
-    paddingTop: 0,
   },
   header: {
     backgroundColor: '#4A4E69',
@@ -58,6 +148,47 @@ const styles = StyleSheet.create({
   backIcon: {
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  toggleButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginVertical: 10,
+  },
+  toggleButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    backgroundColor: '#4A4E69',
+    borderRadius: 20,
+  },
+  activeButton: {
+    backgroundColor: '#6D6D6D',
+  },
+  buttonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+  },
+  activeButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+  },
+  formContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
+  input: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    marginBottom: 10,
+    padding: 10,
+    width: '100%',
+  },
+  image: {
+    width: 200,
+    height: 200,
+    marginVertical: 10,
   },
   navbar: {
     flexDirection: 'row',
@@ -79,14 +210,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   navText: {
-    color: 'white',
+    color: '#FFF',
     fontSize: 12,
-  },
-  title: {
-    fontSize: 25,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
   },
 });
 
