@@ -262,16 +262,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#4A4E69',
   },
   navbar: {
+    flexDirection: 'row',
+    justifyContent: 'space-around', // Changed from 'space-between' to 'space-around' to reduce space between buttons
+    backgroundColor: '#4A4E69',
+    paddingHorizontal: 10, // Reduced paddingHorizontal to make buttons closer
+    paddingVertical: 20, // Increased padding vertical to make the navbar larger
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
-    height: 60,
-    backgroundColor: '#4A4E69',
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    paddingHorizontal: 20,
   },
   navButton: {
     alignItems: 'center',
@@ -279,11 +278,11 @@ const styles = StyleSheet.create({
   icon: {
     width: 24,
     height: 24,
-    marginBottom: 2,
+    marginBottom: 5,
   },
   navText: {
-    color: 'white',
-    fontSize: 12,
+    color: '#FFFFFF',
+    fontSize: 10,
   },
 });
 

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Image, StyleSheet, StatusBar, Switch, Modal, FlatList } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
 
 const ReclamosVecino = ({ route, navigation }) => {
   const [showMyReclamos, setShowMyReclamos] = useState(false);
@@ -59,16 +60,48 @@ const ReclamosVecino = ({ route, navigation }) => {
       .catch(error => console.error('Error fetching imagenes de reclamo:', error));
   };
 
-  const handleAddImage = () => {
-    // Lógica para agregar una imagen al reclamo
-    // Por ejemplo:
-    // uploadImageToServer()
-    //   .then(() => {
-    //     setImagenesReclamo({}); // Limpiar el estado de imágenes para forzar la recarga
-    //     fetchReclamos(); // Actualizar la lista de reclamos después de agregar la imagen
-    //   })
-    //   .catch(error => console.error('Error uploading image:', error));
+  const handleAddImage = async (idReclamo) => {
+    try {
+      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!permissionResult.granted) {
+        alert('Permission to access camera roll is required!');
+        return;
+      }
+  
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+  
+      if (!result.cancelled) {
+        const formData = new FormData();
+        formData.append('mail', mail);
+        formData.append('idReclamo', idReclamo);
+        formData.append('imagen', {
+          uri: result.uri,
+          type: 'image/jpeg',
+          name: 'imageName.jpg',
+        });
+  
+        fetch('http://192.168.0.241:8080/inicio/agregarImagenAreclamoVecino', {
+          method: 'POST',
+          body: formData,
+        })
+          .then(response => response.json())
+          .then(data => {
+            console.log('Image added successfully:', data);
+            setImagenesReclamo({}); // Limpiar el estado de imágenes para forzar la recarga
+            fetchReclamos(); // Actualizar la lista de reclamos después de agregar la imagen
+          })
+          .catch(error => console.error('Error uploading image:', error));
+      }
+    } catch (error) {
+      console.error('Error accessing image library:', error);
+    }
   };
+  
 
   const clearCacheAndFetchReclamos = () => {
     setImagenesReclamo({}); // Limpiar el estado de imágenes para forzar la recarga
@@ -125,9 +158,9 @@ const ReclamosVecino = ({ route, navigation }) => {
             <Text style={styles.reclamoText}>ID Reclamo Unificado: {reclamo.idReclamoUnificado}</Text>
             <Text style={styles.reclamoText}>Descripción: {reclamo.descripcion}</Text>
             {showMyReclamos && (
-              <TouchableOpacity style={styles.imageButton} onPress={handleAddImage}>
-                <Text style={styles.imageButtonText}>Agregar Imagen</Text>
-              </TouchableOpacity>
+              <TouchableOpacity style={styles.imageButton} onPress={() => handleAddImage(reclamo.idReclamo)}>
+              <Text style={styles.imageButtonText}>Agregar Imagen</Text>
+            </TouchableOpacity>
             )}
             <TouchableOpacity style={styles.movimientosButton} onPress={() => fetchMovimientosReclamo(reclamo.idReclamo)}>
               <Text style={styles.movimientosButtonText}>Movimientos</Text>

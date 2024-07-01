@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Image, StyleSheet, StatusBar, Alert } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Image, StyleSheet, StatusBar, FlatList, Dimensions, Alert } from 'react-native';
 import axios from 'axios';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -8,11 +8,21 @@ const ServiciosInspector = ({ route, navigation }) => {
   const [serviciosComercios, setServiciosComercios] = useState([]);
   const [serviciosProfesionales, setServiciosProfesionales] = useState([]);
   const [showComercios, setShowComercios] = useState(true);
+
   useEffect(() => {
     const fetchServiciosComercios = async () => {
       try {
-        const response = await axios.get('http://192.168.0.241:8080/inicio/servicios/comercios');
-        setServiciosComercios(response.data);
+        const response = await axios.get('http://localhost:8080/inicio/servicios/comercios');
+        const comerciosConImagenes = await Promise.all(response.data.map(async (comercio) => {
+          try {
+            const imagenesResponse = await axios.get(`http://localhost:8080/inicio/imagenesServicioComercio?idServicioComercio=${comercio.idServicioComercio}`);
+            return { ...comercio, imagenes: imagenesResponse.data };
+          } catch (error) {
+            console.error('Error fetching imágenes de comercio:', error);
+            return { ...comercio, imagenes: [] };
+          }
+        }));
+        setServiciosComercios(comerciosConImagenes);
       } catch (error) {
         console.error('Error fetching comercios:', error);
       }
@@ -21,7 +31,16 @@ const ServiciosInspector = ({ route, navigation }) => {
     const fetchServiciosProfesionales = async () => {
       try {
         const response = await axios.get('http://localhost:8080/inicio/servicios/profesionales');
-        setServiciosProfesionales(response.data);
+        const profesionalesConImagenes = await Promise.all(response.data.map(async (profesional) => {
+          try {
+            const imagenesResponse = await axios.get(`http://localhost:8080/inicio/imagenesServicioProfesional?idServicioProfesional=${profesional.idservicioprofesional}`);
+            return { ...profesional, imagenes: imagenesResponse.data };
+          } catch (error) {
+            console.error('Error fetching imágenes de profesional:', error);
+            return { ...profesional, imagenes: [] };
+          }
+        }));
+        setServiciosProfesionales(profesionalesConImagenes);
       } catch (error) {
         console.error('Error fetching profesionales:', error);
       }
@@ -39,7 +58,19 @@ const ServiciosInspector = ({ route, navigation }) => {
 
   const renderCard = (servicio, index) => (
     <View key={index} style={styles.card}>
-      <Image source={require('./assets/luzRota.jpeg')} style={styles.cardImage} />
+      {servicio.imagenes.length > 0 ? (
+        <FlatList
+          data={servicio.imagenes}
+          horizontal
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item }) => (
+            <Image source={{ uri: item }} style={styles.cardImage} />
+          )}
+          showsHorizontalScrollIndicator={false}
+        />
+      ) : (
+        <Image source={require('./assets/luzRota.jpeg')} style={styles.cardImage} />
+      )}
       {servicio.nombre !== undefined && (
         <View style={{ flexDirection: "column" }}>
           <Text style={styles.cardText}><Text style={styles.boldText}>Responsable:</Text> {servicio.apellido + " " + servicio.nombre}</Text>
@@ -193,31 +224,33 @@ const styles = StyleSheet.create({
   },
   navbar: {
     flexDirection: 'row',
-    justifyContent: 'space-around', // Changed from 'space-between' to 'space-around' to reduce space between buttons
+    justifyContent: 'space-around',
     backgroundColor: '#4A4E69',
-    paddingHorizontal: 10, // Reduced paddingHorizontal to make buttons closer
-    paddingVertical: 20, // Increased padding vertical to make the navbar larger
+    paddingHorizontal: 10,
+    paddingVertical: 20,
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
   },
   navButton: {
+    justifyContent: 'center',
     alignItems: 'center',
   },
-  icon: {
-    width: 25, // Increased icon size
-    height: 25, // Increased icon size
-    marginBottom: 5, // Reduced marginBottom to make buttons closer
-  },
   navText: {
-    color: 'white',
-    fontSize: 14, // Increased font size for better visibility
+    color: '#FFF',
+    fontSize: 12,
+    marginTop: 5,
+  },
+  icon: {
+    width: 30,
+    height: 30,
   },
   cardImage: {
-    width: '100%',
+    width: Dimensions.get('window').width - 60,
     height: 200,
     borderRadius: 10,
+    marginBottom: 10,
   },
 });
 

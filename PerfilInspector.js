@@ -80,8 +80,8 @@ const PerfilInspector = ({ route, navigation }) => {
         <TouchableOpacity style={styles.backIcon} onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={24} color="white" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Mimuni</Text>
-        <Ionicons name="mail" size={24} color="white" />
+        <Text style={styles.headerTitle}>MiMuni</Text>
+        <View style={{ width: 20 }}></View>
       </View>
       <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
         <Text style={styles.title}>Datos Personales</Text>

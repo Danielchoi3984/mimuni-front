@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Image, StyleSheet, StatusBar, Switch, Modal, FlatList, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
 
 const ReclamosInspector = ({ route, navigation }) => {
   const [showMyReclamos, setShowMyReclamos] = useState(false);
@@ -16,8 +17,8 @@ const ReclamosInspector = ({ route, navigation }) => {
 
   const fetchReclamos = () => {
     let endpoint = showMyReclamos
-      ? `http://192.168.0.241:8080/inicio/misReclamosInspector?legajo=${legajo}`
-      : `http://192.168.0.241:8080/inicio/reclamosPorSector?legajo=${legajo}`;
+      ? `http://localhost:8080/inicio/misReclamosInspector?legajo=${legajo}`
+      : `http://localhost:8080/inicio/reclamosPorSector?legajo=${legajo}`;
 
     fetch(endpoint)
       .then(response => response.json())
@@ -25,7 +26,7 @@ const ReclamosInspector = ({ route, navigation }) => {
         if (Array.isArray(data)) {
           setReclamos(data);
           data.forEach(reclamo => {
-            fetchImagenesReclamo(reclamo.idReclamo); // Llamar a la función para obtener imágenes
+            fetchImagenesReclamo(reclamo.idReclamo);
           });
         } else {
           console.error('Error fetching reclamos: Response is not an array', data);
@@ -35,7 +36,7 @@ const ReclamosInspector = ({ route, navigation }) => {
   };
 
   const fetchMovimientosReclamo = (idReclamo) => {
-    fetch(`http://192.168.0.241:8080/inicio/movimientosReclamo?idReclamo=${idReclamo}`)
+    fetch(`http://localhost:8080/inicio/movimientosReclamo?idReclamo=${idReclamo}`)
       .then(response => response.json())
       .then(data => {
         setMovimientosReclamo(data);
@@ -45,7 +46,7 @@ const ReclamosInspector = ({ route, navigation }) => {
   };
 
   const fetchImagenesReclamo = (idReclamo) => {
-    fetch(`http://192.168.0.241:8080/inicio/imagenesReclamo?idReclamo=${idReclamo}`)
+    fetch(`http://localhost:8080/inicio/imagenesReclamo?idReclamo=${idReclamo}`)
       .then(response => response.json())
       .then(data => {
         setImagenesReclamo(prevState => ({
@@ -56,16 +57,59 @@ const ReclamosInspector = ({ route, navigation }) => {
       .catch(error => console.error('Error fetching imagenes de reclamo:', error));
   };
 
-  const handleAddImage = () => {
-    // Lógica para agregar una imagen al reclamo
-    // Por ejemplo:
-    // uploadImageToServer()
-    //   .then(() => {
-    //     setImagenesReclamo({}); // Limpiar el estado de imágenes para forzar la recarga
-    //     fetchReclamos(); // Actualizar la lista de reclamos después de agregar la imagen
-    //   })
-    //   .catch(error => console.error('Error uploading image:', error));
+  const handleAddImage = async (idReclamo) => {
+    try {
+      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!permissionResult.granted) {
+        alert('Permission to access camera roll is required!');
+        return;
+      }
+  
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+  
+      if (!result.cancelled) {
+        const formData = new FormData();
+        formData.append('legajo', legajo);
+        formData.append('idReclamo', idReclamo);
+        formData.append('files', {
+          uri: result.uri,
+          type: 'image/jpeg',
+          name: 'imageName.jpg',
+        });
+  
+        const response = await fetch('http://192.168.0.241:8080/inicio/agregarImagenAreclamoInspector', {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+  
+        // Verificar el estado de la respuesta
+        if (!response.ok) {
+          throw new Error(`Error uploading image: ${response.status} - ${response.statusText}`);
+        }
+  
+        // Manejar la respuesta (puede no ser JSON)
+        const responseData = await response.text(); // Obtener el texto de la respuesta
+        console.log('Image added successfully:', responseData);
+        Alert.alert("Exito", responseData);
+  
+        // Actualizar el estado de imágenes
+        setImagenesReclamo({}); // Limpiar el estado de imágenes para forzar la recarga
+        fetchReclamos(); // Actualizar la lista de reclamos después de agregar la imagen
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error.message);
+      // Aquí podrías mostrar una alerta o un mensaje de error según sea necesario
+    }
   };
+  
 
   const showAlert = () => {
     Alert.alert(
@@ -130,7 +174,7 @@ const ReclamosInspector = ({ route, navigation }) => {
               <Text style={styles.reclamoText}>ID Reclamo Unificado: {reclamo.idReclamoUnificado}</Text>
               <Text style={styles.reclamoText}>Descripción: {reclamo.descripcion}</Text>
               {showMyReclamos && (
-                <TouchableOpacity style={styles.imageButton} onPress={handleAddImage}>
+                <TouchableOpacity style={styles.imageButton} onPress={() => handleAddImage(reclamo.idReclamo)}>
                   <Text style={styles.imageButtonText}>Agregar Imagen</Text>
                 </TouchableOpacity>
               )}
@@ -162,7 +206,7 @@ const ReclamosInspector = ({ route, navigation }) => {
               </View>
             ))}
             <Text style={styles.modalText}>Imágenes del Reclamo:</Text>
-            
+
             <TouchableOpacity
               style={{ ...styles.openButton, backgroundColor: '#2196F3' }}
               onPress={() => {
@@ -175,24 +219,17 @@ const ReclamosInspector = ({ route, navigation }) => {
         </View>
       </Modal>
       <View style={styles.navbar}>
-        <TouchableOpacity style={styles.navButton} onPress={() => navigation.navigate('ServiciosInspector', { legajo })}>
-          <Image source={require('./assets/servicios.png')} style={styles.icon} />
-          <Text style={styles.navText}>Servicios</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.navButton} onPress={() => navigation.navigate('ReclamosInspector', { legajo })}>
-          <Image source={require('./assets/reclamos.png')} style={styles.icon} />
-          <Text style={styles.navText}>Reclamos</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.navButton} onPress={() => showAlert()}>
-          <Image source={require('./assets/denuncias.png')} style={styles.icon} />
-          <Text style={styles.navText}>Denuncias</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.navButton} onPress={() => navigation.navigate('PerfilInspector', { legajo })}>
-          <Image source={require('./assets/perfil.png')} style={styles.icon} />
+        <TouchableOpacity style={styles.navButton} onPress={() => navigation.navigate('PerfilInspector')}>
+          <Ionicons name="person-circle-outline" size={24} color="white" />
           <Text style={styles.navText}>Perfil</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.navButton} onPress={() => showAlert()}>
+          <Ionicons name="document-outline" size={24} color="white" />
+          <Text style={styles.navText}>Generar Denuncia</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.navButton} onPress={() => navigation.navigate('ServiciosInspector')}>
+          <Ionicons name="list-outline" size={24} color="white" />
+          <Text style={styles.navText}>Servicios</Text>
         </TouchableOpacity>
       </View>
     </View>
