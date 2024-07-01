@@ -102,6 +102,12 @@ const GenerarDenuncia = ({ route, navigation }) => {
           
               console.log('Imágenes y datos subidos exitosamente:', response.data);
           
+              // Limpiar los campos después de enviar la denuncia
+              setDocumento('');
+              setSitio('');
+              setDescripcion('');
+              setImages([]);
+          
               // Mostrar el número de denuncia en un Alert si la respuesta es exitosa
               Alert.alert('Éxito', response.data);
           

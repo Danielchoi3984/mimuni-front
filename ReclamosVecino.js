@@ -311,7 +311,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   movimientosButton: {
-    backgroundColor: '#FF9800',
+    backgroundColor: '#4A4E69',
     padding: 10,
     borderRadius: 5,
     marginTop: 10,

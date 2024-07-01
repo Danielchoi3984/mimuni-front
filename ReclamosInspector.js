@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   actionButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#4A4E69',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
@@ -330,7 +330,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   movimientosButton: {
-    backgroundColor: '#FFC107',
+    backgroundColor: '#4A4E69',
     paddingVertical: 8,
     paddingHorizontal: 20,
     borderRadius: 5,

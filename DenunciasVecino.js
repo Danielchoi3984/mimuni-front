@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Image, StyleSheet, StatusBar, Modal, Alert } from 'react-native';
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, ScrollView, Image, Modal, StyleSheet, StatusBar } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import axios from 'axios';
 
 const DenunciasVecino = ({ route, navigation }) => {
   const [denunciasRecibidas, setDenunciasRecibidas] = useState([]);
@@ -9,42 +9,66 @@ const DenunciasVecino = ({ route, navigation }) => {
   const [showRecibidas, setShowRecibidas] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [movimientosDenuncia, setMovimientosDenuncia] = useState([]);
+  const [denunciaSeleccionada, setDenunciaSeleccionada] = useState(null);
+  const [imagenesDenuncia, setImagenesDenuncia] = useState([]);
 
   const { mail } = route.params || {};
 
+  const fetchDenunciasRecibidas = async () => {
+    try {
+      const response = await axios.get(`http://localhost:8080/inicio/denunciasRecibidas?mail=${mail}`);
+      const denuncias = response.data;
+
+      // Fetch images for each denuncia
+      const denunciasConImagenes = await Promise.all(denuncias.map(async (denuncia) => {
+        const imagenesResponse = await axios.get(`http://localhost:8080/inicio/imagenesDenuncia?idDenuncia=${denuncia.idDenuncias}`);
+        const imagenes = imagenesResponse.data;
+        return { ...denuncia, imagenes }; // Store all images in the denuncia object
+      }));
+
+      setDenunciasRecibidas(denunciasConImagenes);
+    } catch (error) {
+      console.error('Error fetching denuncias recibidas:', error);
+    }
+  };
+
+  const fetchDenunciasRealizadas = async () => {
+    try {
+      const response = await axios.get(`http://localhost:8080/inicio/denunciasRealizadas?mail=${mail}`);
+      const denuncias = response.data;
+
+      // Fetch images for each denuncia
+      const denunciasConImagenes = await Promise.all(denuncias.map(async (denuncia) => {
+        const imagenesResponse = await axios.get(`http://localhost:8080/inicio/imagenesDenuncia?idDenuncia=${denuncia.idDenuncias}`);
+        const imagenes = imagenesResponse.data;
+        return { ...denuncia, imagenes }; // Store all images in the denuncia object
+      }));
+
+      setDenunciasRealizadas(denunciasConImagenes);
+    } catch (error) {
+      console.error('Error fetching denuncias realizadas:', error);
+    }
+  };
+
   useEffect(() => {
-    const fetchDenunciasRecibidas = async () => {
-      try {
-        const response = await axios.get(`http://192.168.0.241:8080/inicio/denunciasRecibidas?mail=${mail}`);
-        setDenunciasRecibidas(response.data);
-      } catch (error) {
-        console.error('Error fetching denuncias recibidas:', error);
-      }
-    };
-
-    const fetchDenunciasRealizadas = async () => {
-      try {
-        const response = await axios.get(`http://192.168.0.241:8080/inicio/denunciasRealizadas?mail=${mail}`);
-        setDenunciasRealizadas(response.data);
-      } catch (error) {
-        console.error('Error fetching denuncias realizadas:', error);
-      }
-    };
-
     fetchDenunciasRecibidas();
     fetchDenunciasRealizadas();
   }, [mail]);
 
-  React.useLayoutEffect(() => {
-    navigation.setOptions({
-      headerShown: false,
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      fetchDenunciasRecibidas();
+      fetchDenunciasRealizadas();
     });
+
+    return unsubscribe;
   }, [navigation]);
 
   const fetchMovimientosDenuncia = (idDenuncia) => {
-    axios.get(`http://192.168.0.241:8080/inicio/movimientosDenuncia?idDenuncia=${idDenuncia}`)
+    axios.get(`http://localhost:8080/inicio/movimientosDenuncia?idDenuncia=${idDenuncia}`)
       .then(response => {
         setMovimientosDenuncia(response.data);
+        setDenunciaSeleccionada(idDenuncia);
         setModalVisible(true);
       })
       .catch(error => {
@@ -54,7 +78,6 @@ const DenunciasVecino = ({ route, navigation }) => {
 
   const renderCard = (denuncia, index) => (
     <View key={index} style={styles.card}>
-      <Image source={require('./assets/luzRota.jpeg')} style={styles.cardImage} />
       {denuncia.titulo && (
         <View style={{ flexDirection: "column" }}>
           <Text style={styles.cardText}><Text style={styles.boldText}>Título:</Text> {denuncia.titulo}</Text>
@@ -64,7 +87,14 @@ const DenunciasVecino = ({ route, navigation }) => {
       )}
       {denuncia.descripcion && (
         <View style={{ flexDirection: "column" }}>
-           <Text style={styles.cardText}><Text style={styles.boldText}>ID:</Text> {denuncia.idDenuncias}</Text>
+          
+          <ScrollView horizontal>
+            {denuncia.imagenes.map((imagen, index) => (
+              <Image key={index} source={{ uri: imagen }} style={styles.cardImage} />
+            ))}
+          </ScrollView>
+          <Text style={styles.cardText}><Text style={styles.boldText}>ID:</Text> {denuncia.idDenuncias}</Text>
+          <Text style={styles.cardText}><Text style={styles.boldText}>DNI Denunciado:</Text> {denuncia.documento}</Text>
           <Text style={styles.cardText}><Text style={styles.boldText}>Descripción:</Text> {denuncia.descripcion}</Text>
         </View>
       )}
@@ -139,7 +169,11 @@ const DenunciasVecino = ({ route, navigation }) => {
             ))}
             <TouchableOpacity
               style={{ ...styles.openButton, backgroundColor: '#2196F3' }}
-              onPress={() => setModalVisible(false)}
+              onPress={() => {
+                setModalVisible(false);
+                setDenunciaSeleccionada(null);
+                setImagenesDenuncia([]);
+              }}
             >
               <Text style={styles.textStyle}>Cerrar</Text>
             </TouchableOpacity>
@@ -176,6 +210,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F2E9E4',
     paddingTop: 0,
+    paddingBottom: 80,
   },
   header: {
     backgroundColor: '#4A4E69',
@@ -252,12 +287,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     elevation: 2,
   },
-  cardImage: {
-    width: '100%',
-    height: 150,
-    marginBottom: 10,
-    borderRadius: 10,
-  },
   cardText: {
     fontSize: 16,
     marginBottom: 10,
@@ -265,6 +294,12 @@ const styles = StyleSheet.create({
   },
   boldText: {
     fontWeight: 'bold',
+  },
+  cardImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 5,
+    marginRight: 10,
   },
   movimientosButton: {
     backgroundColor: '#4A4E69',
@@ -280,10 +315,10 @@ const styles = StyleSheet.create({
   },
   navbar: {
     flexDirection: 'row',
-    justifyContent: 'space-around', // Changed from 'space-between' to 'space-around' to reduce space between buttons
+    justifyContent: 'space-around',
     backgroundColor: '#4A4E69',
-    paddingHorizontal: 10, // Reduced paddingHorizontal to make buttons closer
-    paddingVertical: 20, // Increased padding vertical to make the navbar larger
+    paddingHorizontal: 10,
+    paddingVertical: 20,
     position: 'absolute',
     bottom: 0,
     left: 0,
@@ -293,13 +328,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   icon: {
-    width: 25, // Increased icon size
-    height: 25, // Increased icon size
-    marginBottom: 5, // Reduced marginBottom to make buttons closer
+    width: 25,
+    height: 25,
+    marginBottom: 5,
   },
   navText: {
     color: 'white',
-    fontSize: 14, // Increased font size for better visibility
+    fontSize: 14,
   },
   centeredView: {
     flex: 1,
@@ -346,6 +381,12 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
     marginBottom: 10,
   },
+  modalImage: {
+    width: 300,
+    height: 200,
+    resizeMode: 'cover',
+    borderRadius: 10,
+    marginRight: 10,
+  },
 });
-
 export default DenunciasVecino;

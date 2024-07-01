@@ -157,8 +157,8 @@ export default function GenerarReclamoVecino({ route, navigation }) {
           <Text>{idDesperfecto ? `Desperfecto ID: ${idDesperfecto}` : 'Seleccionar Desperfecto'}</Text>
         </TouchableOpacity>
         <Button title="Seleccionar imagen de la galería" onPress={pickImage} />
-        <Button title="Tomar una foto" onPress={takePhoto} />
-        <Button title="Subir imágenes" onPress={uploadImages} />
+        
+        <Button title="Generar Reclamo" onPress={uploadImages} />
         {images.map((image, index) => (
           <Image key={index} source={{ uri: image.uri }} style={styles.image} />
         ))}
@@ -201,7 +201,7 @@ export default function GenerarReclamoVecino({ route, navigation }) {
           <Image source={require('./assets/reclamos.png')} style={styles.icon} />
           <Text style={styles.navText}>Reclamos</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.navButton}>
+        <TouchableOpacity style={styles.navButton} onPress={() => navigation.navigate('DenunciasVecino', { mail })}>
           <Image source={require('./assets/denuncias.png')} style={styles.icon} />
           <Text style={styles.navText}>Denuncias</Text>
         </TouchableOpacity>
