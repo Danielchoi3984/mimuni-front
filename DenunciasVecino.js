@@ -184,15 +184,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    height: 130,
-  },
-  backIcon: {
-    padding: 5,
   },
   headerTitle: {
-    color: 'white',
-    fontSize: 24,
+    color: '#FFFFFF',
+    fontSize: 30,
     fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  backIcon: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   scrollView: {
     padding: 20,

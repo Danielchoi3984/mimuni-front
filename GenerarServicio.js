@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet, TextInput, Button, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, Image, StyleSheet, TextInput, Button, ScrollView, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
@@ -59,6 +59,7 @@ const GenerarServicio = ({ route, navigation }) => {
       });
 
       console.log('Respuesta de subida:', response.data);
+      Alert.alert('Éxito', "El servicio se ha creado, la habilitación puede demorar hasta 15 días hábiles");
       // Manejar la respuesta del servidor según sea necesario
 
     } catch (error) {

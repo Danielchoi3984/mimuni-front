@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Modal, FlatList, Alert, Button } from 'react-native';
+import { Button, Image, Text, View, StyleSheet, TouchableOpacity, Alert, TextInput, Modal, FlatList, StatusBar } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
+import { Ionicons } from '@expo/vector-icons';
 
 const GenerarDenuncia = ({ route, navigation }) => {
+  const [images, setImages] = useState([]);
   const [documento, setDocumento] = useState('');
   const [sitio, setSitio] = useState('');
   const [descripcion, setDescripcion] = useState('');
-  const [fotos, setFotos] = useState([]);
   const [sitios, setSitios] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const { mail } = route.params || {};
-  
+
   useEffect(() => {
     getSitios();
   }, []);
@@ -27,29 +27,34 @@ const GenerarDenuncia = ({ route, navigation }) => {
     }
   };
 
-  const handleDocumentoChange = (text) => {
-    setDocumento(text);
-  };
-
-  const handleSitioChange = (text) => {
-    setSitio(text);
-  };
-
-  const handleDescripcionChange = (text) => {
-    setDescripcion(text);
-  };
-
-  const handleImagePick = async () => {
+  const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
-      multiple: true,
     });
 
-    if (!result.cancelled) {
-      setFotos([...fotos, result.uri]);
+    console.log('Resultado del selector de imágenes:', result);
+
+    if (!result.canceled) {
+      const newImages = [...images, result.assets[0]];
+      setImages(newImages);
+    }
+  };
+
+  const takePhoto = async () => {
+    let result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    console.log('Resultado de la cámara:', result);
+
+    if (!result.canceled) {
+      const newImages = [...images, result.assets[0]];
+      setImages(newImages);
     }
   };
 
@@ -62,17 +67,18 @@ const GenerarDenuncia = ({ route, navigation }) => {
     setModalVisible(false);
   };
 
-  const handleSubmit = async () => {
+  const uploadData = async () => {
     try {
       const formData = new FormData();
       formData.append('mail', mail);
       formData.append('dniDenunciado', documento);
-      formData.append('idSitio', sitio);
+      formData.append('idSitio', parseInt(sitio));
       formData.append('descripcion', descripcion);
-      fotos.forEach((foto, index) => {
+  
+      images.forEach((image, index) => {
         formData.append('files', {
-          uri: foto,
-          name: `foto${index}.jpg`,
+          uri: image.uri,
+          name: `foto_${index}.jpg`,
           type: 'image/jpeg',
         });
       });
@@ -83,20 +89,29 @@ const GenerarDenuncia = ({ route, navigation }) => {
         },
       });
   
-      console.log('Respuesta del servidor:', response.data);
+      console.log('Imágenes y datos subidos exitosamente:', response.data);
   
-      setDocumento('');
-      setSitio('');
-      setDescripcion('');
-      setFotos([]);
+      // Mostrar el número de denuncia en un Alert si la respuesta es exitosa
+      Alert.alert('Éxito', response.data);
+  
     } catch (error) {
-      console.error('Error al enviar la denuncia:', error);
-      Alert.alert('Error', `Error al enviar la denuncia: ${error.message}`);
+      console.error('Error al subir imágenes y datos:', error);
+      if (error.response) {
+        console.log('Datos de respuesta de error:', error.response.data);
+        console.log('Estado de respuesta de error:', error.response.status);
+        console.log('Encabezados de respuesta de error:', error.response.headers);
+      } else if (error.request) {
+        console.log('Datos de solicitud de error:', error.request);
+      } else {
+        console.log('Mensaje de error:', error.message);
+      }
+      Alert.alert('Error', 'Error al subir imágenes y datos: ' + error.message);
     }
   };
 
   return (
     <View style={styles.container}>
+      <StatusBar />
       <View style={styles.header}>
         <TouchableOpacity style={styles.backIcon} onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={24} color="white" />
@@ -105,42 +120,33 @@ const GenerarDenuncia = ({ route, navigation }) => {
         <View style={{ width: 20 }}></View>
       </View>
 
-      <Text style={styles.label}>Documento:</Text>
-      <TextInput
-        style={styles.input}
-        value={documento}
-        onChangeText={handleDocumentoChange}
-        placeholder="Ingrese el documento"
-      />
-
-      <Text style={styles.label}>Sitio:</Text>
-      <TouchableOpacity style={styles.input} onPress={handleSitioPress}>
-        <Text>{sitio ? `Sitio ID: ${sitio}` : 'Seleccionar Sitio'}</Text>
-      </TouchableOpacity>
-
-      <Text style={styles.label}>Descripción:</Text>
-      <TextInput
-        style={[styles.input, { height: 100 }]}
-        value={descripcion}
-        onChangeText={handleDescripcionChange}
-        placeholder="Ingrese la descripción (máximo 1000 caracteres)"
-        multiline
-        maxLength={1000}
-      />
-
-      <TouchableOpacity style={styles.button} onPress={handleImagePick}>
-        <Text style={styles.buttonText}>Seleccionar Fotos</Text>
-      </TouchableOpacity>
-
-      <View style={styles.imageContainer}>
-        {fotos.map((foto, index) => (
-          <Image key={index} source={{ uri: foto }} style={styles.image} />
+      <View style={styles.content}>
+        <Text style={styles.label}>Documento:</Text>
+        <TextInput
+          style={styles.input}
+          value={documento}
+          onChangeText={setDocumento}
+          placeholder="Ingrese el documento"
+        />
+        <TouchableOpacity style={styles.input} onPress={handleSitioPress}>
+          <Text>{sitio ? `Sitio ID: ${sitio}` : 'Seleccionar Sitio'}</Text>
+        </TouchableOpacity>
+        <Text style={styles.label}>Descripción:</Text>
+        <TextInput
+          style={[styles.input, { height: 100 }]}
+          value={descripcion}
+          onChangeText={setDescripcion}
+          placeholder="Ingrese la descripción (máximo 1000 caracteres)"
+          multiline
+          maxLength={1000}
+        />
+        <Button title="Seleccionar imagen de la galería" onPress={pickImage} />
+        <Button title="Tomar una foto" onPress={takePhoto} />
+        <Button title="Subir imágenes" onPress={uploadData} />
+        {images.map((image, index) => (
+          <Image key={index} source={{ uri: image.uri }} style={styles.image} />
         ))}
       </View>
-
-      <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-        <Text style={styles.buttonText}>Enviar Denuncia</Text>
-      </TouchableOpacity>
 
       <Modal
         animationType="slide"
@@ -190,7 +196,7 @@ const GenerarDenuncia = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F2E9E4',
+    backgroundColor: '#F8F8F8',
     paddingTop: 0,
   },
   header: {
@@ -211,6 +217,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  content: {
+    flex: 1,
+    padding: 20,
+  },
   label: {
     fontSize: 16,
     fontWeight: 'bold',
@@ -221,66 +231,30 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     borderRadius: 5,
     padding: 10,
-    marginBottom: 10,
+    marginBottom: 20,
   },
   button: {
     backgroundColor: '#4A4E69',
     padding: 15,
-    borderRadius: 10,
+    borderRadius: 5,
     alignItems: 'center',
-    marginBottom: 10,
-  },
-  submitButton: {
-    backgroundColor: '#8C7D85',
-    padding: 15,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginTop: 20,
+    marginBottom: 20,
   },
   buttonText: {
-    color: '#FFF',
+    color: 'white',
     fontWeight: 'bold',
-    fontSize: 16,
-  },
-  imageContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginBottom: 20,
   },
   image: {
     width: 100,
     height: 100,
-    borderRadius: 10,
     marginRight: 10,
     marginBottom: 10,
-  },
-  navbar: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    backgroundColor: '#4A4E69',
-    paddingHorizontal: 10,
-    paddingVertical: 20,
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-  },
-  navButton: {
-    alignItems: 'center',
-  },
-  icon: {
-    width: 24,
-    height: 24,
-  },
-  navText: {
-    color: '#FFFFFF',
-    fontSize: 12,
   },
   centeredView: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    marginTop: 22,
   },
   modalView: {
     margin: 20,
@@ -307,7 +281,29 @@ const styles = StyleSheet.create({
     padding: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
-    width: '100%',
+  },
+  navbar: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    backgroundColor: '#4A4E69',
+    paddingHorizontal: 10,
+    paddingVertical: 20,
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+  },
+  navButton: {
+    alignItems: 'center',
+  },
+  icon: {
+    width: 25,
+    height: 25,
+    marginBottom: 5,
+  },
+  navText: {
+    color: 'white',
+    fontSize: 14,
   },
 });
 

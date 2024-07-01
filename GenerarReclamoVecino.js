@@ -115,7 +115,8 @@ export default function GenerarReclamoVecino({ route, navigation }) {
       });
 
       console.log('Imágenes y datos subidos exitosamente:', response.data);
-      Alert.alert('Éxito', '¡Imágenes y datos subidos exitosamente!');
+      Alert.alert('Éxito', response.data);
+      
     } catch (error) {
       console.error('Error al subir imágenes y datos:', error);
       if (error.response) {

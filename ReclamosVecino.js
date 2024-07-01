@@ -86,13 +86,12 @@ const ReclamosVecino = ({ route, navigation }) => {
         <View style={{ width: 20 }}></View>
       </View>
       <ScrollView contentContainerStyle={styles.scrollView}>
-        <View style={styles.sectionTitleContainer}>
-          <Text style={styles.sectionTitle}>Reclamos</Text>
-        </View>
-        <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate('GenerarReclamoVecino', { mail })}>
+        <TouchableOpacity style={[styles.actionButton, { marginBottom: 10 }]} onPress={() => navigation.navigate('GenerarReclamoVecino', { mail })}>
+          <Ionicons name="add" size={24} color="white" style={styles.buttonIcon} />
           <Text style={styles.buttonText}>Generar Reclamo</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate('BuscarReclamo', { mail })}>
+        <TouchableOpacity style={[styles.actionButton, { marginBottom: 10 }]} onPress={() => navigation.navigate('BuscarReclamo', { mail })}>
+          <Ionicons name="search" size={24} color="white" style={styles.buttonIcon} />
           <Text style={styles.buttonText}>Buscar Reclamo</Text>
         </TouchableOpacity>
         <View style={styles.sectionTitleContainer}>
@@ -173,8 +172,8 @@ const ReclamosVecino = ({ route, navigation }) => {
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.navButton} onPress={() => navigation.navigate('ReclamosVecino', { mail })}>
-        <Image source={require('./assets/reclamos.png')} style={styles.icon} />
-        <Text style={styles.navText}>Reclamos</Text>
+          <Image source={require('./assets/reclamos.png')} style={styles.icon} />
+          <Text style={styles.navText}>Reclamos</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.navButton} onPress={() => navigation.navigate('DenunciasVecino', { mail })}>
@@ -213,10 +212,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
   },
-  backIcon: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+  
   scrollView: {
     padding: 20,
   },
@@ -229,17 +225,23 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   actionButton: {
-    backgroundColor: '#3F51B5',
-    padding: 15,
-    borderRadius: 5,
-    marginTop: 10,
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#4A4E69',
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    justifyContent: 'center', // Centrar contenido horizontalmente
   },
-  
+  buttonIcon: {
+    marginRight: 10,
+  },
   buttonText: {
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
+    textAlign: 'center', // Centrar texto
   },
 
   switchContainer: {
