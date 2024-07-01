@@ -1,6 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Image } from "react-native";
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Image , FlatList} from "react-native";
 import axios from "axios";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -33,8 +33,12 @@ const ServiciosScreen = ({ navigation }) => {
   useEffect(() => {
     const fetchServiciosComercios = async () => {
       try {
-        const response = await axios.get("http://192.168.0.241:8080/inicio/servicios/comercios");
-        setServiciosComercios(response.data);
+        const response = await axios.get("http://localhost:8080/inicio/servicios/comercios");
+        const data = await Promise.all(response.data.map(async servicio => ({
+          ...servicio,
+          imagenes: await fetchImagenesComercios(servicio.idServicioComercio),
+        })));
+        setServiciosComercios(data);
       } catch (error) {
         console.error("Error fetching comercios:", error);
       }
@@ -42,10 +46,34 @@ const ServiciosScreen = ({ navigation }) => {
 
     const fetchServiciosProfesionales = async () => {
       try {
-        const response = await axios.get("http://192.168.0.241:8080/inicio/servicios/profesionales");
-        setServiciosProfesionales(response.data);
+        const response = await axios.get("http://localhost:8080/inicio/servicios/profesionales");
+        const data = await Promise.all(response.data.map(async servicio => ({
+          ...servicio,
+          imagenes: await fetchImagenesProfesionales(servicio.idservicioprofesional),
+        })));
+        setServiciosProfesionales(data);
       } catch (error) {
         console.error("Error fetching profesionales:", error);
+      }
+    };
+
+    const fetchImagenesComercios = async (id) => {
+      try {
+        const response = await axios.get(`http://localhost:8080/inicio/imagenesServicioComercio?idServicioComercio=${id}`);
+        return response.data;
+      } catch (error) {
+        console.error("Error fetching imagenes:", error);
+        return [];
+      }
+    };
+
+    const fetchImagenesProfesionales = async (id) => {
+      try {
+        const response = await axios.get(`http://localhost:8080/inicio/imagenesServicioProfesional?idServicioProfesional=${id}`);
+        return response.data;
+      } catch (error) {
+        console.error("Error fetching imagenes:", error);
+        return [];
       }
     };
 
@@ -55,9 +83,15 @@ const ServiciosScreen = ({ navigation }) => {
 
   const renderCard = (servicio, index) => (
     <View key={index} style={styles.card}>
-      <Image source={require("./assets/luzRota.jpeg")} style={styles.cardImage} />
+      <FlatList
+        horizontal
+        data={servicio.imagenes}
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={({ item }) => <Image source={{ uri: item }} style={styles.cardImage} />}
+      />
       {servicio.nombre !== undefined && (
         <View style={{ flexDirection: "column" }}>
+          <Text style={styles.cardText}><Text style={styles.boldText}>ID:</Text> {servicio.idservicioprofesional}</Text>
           <Text style={styles.cardText}>
             <Text style={styles.boldText}>Responsable:</Text> {servicio.apellido + " " + servicio.nombre}
           </Text>
@@ -71,6 +105,7 @@ const ServiciosScreen = ({ navigation }) => {
       )}
       {servicio.direccion !== undefined && (
         <View style={{ flexDirection: "column" }}>
+          <Text style={styles.cardText}><Text style={styles.boldText}>ID:</Text> {servicio.idServicioComercio}</Text>
           <Text style={styles.cardText}>
             <Text style={styles.boldText}>Dirección:</Text> {servicio.direccion}
           </Text>
@@ -284,9 +319,10 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   cardImage: {
-    width: "100%",
+    width: 200,
     height: 200,
     borderRadius: 10,
+    marginRight: 10,
   },
   switchContainer: {
     flexDirection: "row",

@@ -16,14 +16,17 @@ const GenerarServicio = ({ route, navigation }) => {
   // Función para seleccionar imágenes desde la galería
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
     });
 
-    if (!result.cancelled) {
-      setFotos([...fotos, result.uri]);
+    console.log('Resultado del selector de imágenes:', result);
+
+    if (!result.canceled) {
+      const newImages = [...fotos, result.assets[0]];
+      setFotos(newImages);
     }
   };
 
@@ -43,15 +46,15 @@ const GenerarServicio = ({ route, navigation }) => {
         formData.append('rubro', 'EjemploRubro'); // Ajustar según sea necesario
       }
 
-      fotos.forEach((foto, index) => {
+      fotos.forEach((image, index) => {
         formData.append('files', {
-          uri: foto,
+          uri: image.uri,
           name: `foto_${index}.jpg`,
           type: 'image/jpeg',
         });
       });
 
-      const url = formType === 'comercio' ? 'http://192.168.0.241:8080/inicio/crearServicioComercio' : 'http://192.168.0.241:8080/inicio/crearServicioProfesional';
+      const url = formType === 'comercio' ? 'http://localhost:8080/inicio/crearServicioComercio' : 'http://localhost:8080/inicio/crearServicioProfesional';
       const response = await axios.post(url, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -60,11 +63,10 @@ const GenerarServicio = ({ route, navigation }) => {
 
       console.log('Respuesta de subida:', response.data);
       Alert.alert('Éxito', "El servicio se ha creado, la habilitación puede demorar hasta 15 días hábiles");
-      // Manejar la respuesta del servidor según sea necesario
 
     } catch (error) {
       console.error('Error al subir el formulario:', error);
-      // Manejar errores aquí
+      Alert.alert('Error', 'Error al subir el formulario: ' + error.message);
     }
   };
 
@@ -217,13 +219,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   icon: {
-    width: 25, // Increased icon size
-    height: 25, // Increased icon size
-    marginBottom: 5, // Reduced marginBottom to make buttons closer
+    width: 24,
+    height: 24,
+    marginBottom: 5,
   },
   navText: {
-    color: 'white',
-    fontSize: 14, // Increased font size for better visibility
+    color: '#FFFFFF',
+    fontSize: 10,
   },
 });
 
