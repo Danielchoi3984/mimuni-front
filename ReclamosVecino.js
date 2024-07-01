@@ -92,7 +92,7 @@ const ReclamosVecino = ({ route, navigation }) => {
         <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate('GenerarReclamoVecino', { mail })}>
           <Text style={styles.buttonText}>Generar Reclamo</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.actionButton}>
+        <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate('BuscarReclamo', { mail })}>
           <Text style={styles.buttonText}>Buscar Reclamo</Text>
         </TouchableOpacity>
         <View style={styles.sectionTitleContainer}>

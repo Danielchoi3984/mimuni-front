@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Image, Alert, StyleSheet, StatusBar } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Image, StyleSheet, StatusBar, Modal, Alert } from 'react-native';
 import axios from 'axios';
 import { Ionicons } from '@expo/vector-icons';
 
 const DenunciasVecino = ({ route, navigation }) => {
   const [denunciasRecibidas, setDenunciasRecibidas] = useState([]);
   const [denunciasRealizadas, setDenunciasRealizadas] = useState([]);
-  const [misDenuncias, setMisDenuncias] = useState([]);
   const [showRecibidas, setShowRecibidas] = useState(true);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [movimientosDenuncia, setMovimientosDenuncia] = useState([]);
 
   const { mail } = route.params || {};
-  
+
   useEffect(() => {
     const fetchDenunciasRecibidas = async () => {
       try {
@@ -30,18 +31,8 @@ const DenunciasVecino = ({ route, navigation }) => {
       }
     };
 
-    const fetchMisDenuncias = async () => {
-      try {
-        const response = await axios.get(`http://192.168.0.241:8080/inicio/denuncias/misDenuncias?mail=${mail}`);
-        setMisDenuncias(response.data);
-      } catch (error) {
-        {/*console.error('Error fetching mis denuncias:', error);*/}
-      }
-    };
-
     fetchDenunciasRecibidas();
     fetchDenunciasRealizadas();
-    fetchMisDenuncias();
   }, [mail]);
 
   React.useLayoutEffect(() => {
@@ -50,22 +41,37 @@ const DenunciasVecino = ({ route, navigation }) => {
     });
   }, [navigation]);
 
+  const fetchMovimientosDenuncia = (idDenuncia) => {
+    axios.get(`http://192.168.0.241:8080/inicio/movimientosDenuncia?idDenuncia=${idDenuncia}`)
+      .then(response => {
+        setMovimientosDenuncia(response.data);
+        setModalVisible(true);
+      })
+      .catch(error => {
+        console.error('Error fetching movimientos de denuncia:', error);
+      });
+  };
+
   const renderCard = (denuncia, index) => (
     <View key={index} style={styles.card}>
       <Image source={require('./assets/luzRota.jpeg')} style={styles.cardImage} />
-      {denuncia.titulo !== undefined && (
+      {denuncia.titulo && (
         <View style={{ flexDirection: "column" }}>
           <Text style={styles.cardText}><Text style={styles.boldText}>Título:</Text> {denuncia.titulo}</Text>
           <Text style={styles.cardText}><Text style={styles.boldText}>Fecha:</Text> {denuncia.fecha}</Text>
           <Text style={styles.cardText}><Text style={styles.boldText}>Estado:</Text> {denuncia.estado}</Text>
         </View>
       )}
-      {denuncia.descripcion !== undefined && (
+      {denuncia.descripcion && (
         <View style={{ flexDirection: "column" }}>
+           <Text style={styles.cardText}><Text style={styles.boldText}>ID:</Text> {denuncia.idDenuncias}</Text>
           <Text style={styles.cardText}><Text style={styles.boldText}>Descripción:</Text> {denuncia.descripcion}</Text>
         </View>
       )}
-      <Text style={styles.cardText}><Text style={styles.boldText}>Ubicación:</Text> {denuncia.ubicacion}</Text>
+      <Text style={styles.cardText}><Text style={styles.boldText}>Ubicación:</Text> {denuncia.sitio.calle}</Text>
+      <TouchableOpacity style={styles.movimientosButton} onPress={() => fetchMovimientosDenuncia(denuncia.idDenuncias)}>
+        <Text style={styles.movimientosButtonText}>Movimientos</Text>
+      </TouchableOpacity>
     </View>
   );
 
@@ -110,17 +116,36 @@ const DenunciasVecino = ({ route, navigation }) => {
           </>
         ) : (
           <>
-            <Text style={styles.subtitle}>Mis Denuncias</Text>
-            {misDenuncias.map((denuncia, index) => renderCard(denuncia, index))}
-          </>
-        )}
-        {!showRecibidas && (
-          <>
             <Text style={styles.subtitle}>Denuncias Realizadas</Text>
             {denunciasRealizadas.map((denuncia, index) => renderCard(denuncia, index))}
           </>
         )}
       </ScrollView>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalText}>Movimientos de la Denuncia:</Text>
+            {movimientosDenuncia.map((movimiento, index) => (
+              <View key={index} style={styles.movimientoContainer}>
+                <Text style={styles.modalText}><Text style={styles.boldText}>Causa:</Text> {movimiento.causa}</Text>
+                <Text style={styles.modalText}><Text style={styles.boldText}>Fecha:</Text> {new Date(movimiento.fecha).toLocaleString()}</Text>
+                <Text style={styles.modalText}><Text style={styles.boldText}>Responsable:</Text> {movimiento.responsable}</Text>
+              </View>
+            ))}
+            <TouchableOpacity
+              style={{ ...styles.openButton, backgroundColor: '#2196F3' }}
+              onPress={() => setModalVisible(false)}
+            >
+              <Text style={styles.textStyle}>Cerrar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
       <View style={styles.navbar}>
         <TouchableOpacity style={styles.navButton} onPress={() => navigation.navigate('ServiciosVecino', { mail })}>
           <Image source={require('./assets/servicios.png')} style={styles.icon} />
@@ -146,7 +171,6 @@ const DenunciasVecino = ({ route, navigation }) => {
     </View>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -160,75 +184,96 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-  },
-  headerTitle: {
-    color: '#FFFFFF',
-    fontSize: 30,
-    fontWeight: 'bold',
-    textAlign: 'center',
+    height: 130,
   },
   backIcon: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    padding: 5,
+  },
+  headerTitle: {
+    color: 'white',
+    fontSize: 24,
+    fontWeight: 'bold',
   },
   scrollView: {
-    paddingHorizontal: 15,
-    paddingBottom: 60,
+    padding: 20,
   },
   subtitle: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: 'bold',
-    marginVertical: 10,
-    textAlign: 'center',
-  },
-  card: {
-    backgroundColor: '#8C7D85',
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 20,
-  },
-  cardText: {
-    color: '#FFF',
-    marginBottom: 5,
-  },
-  boldText: {
-    fontWeight: 'bold',
+    color: '#22223B',
+    marginBottom: 10,
+    marginTop: 20,
   },
   buttonContainer: {
-    marginVertical: 20,
-  },
-  actionButton: {
-    backgroundColor: '#8C7D85',
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 10,
-    flexDirection: 'row',
+    marginBottom: 20,
     alignItems: 'center',
   },
+  actionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#4A4E69',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+  },
+  buttonIcon: {
+    marginRight: 10,
+  },
   buttonText: {
-    color: '#FFF',
+    color: 'white',
+    fontSize: 16,
     fontWeight: 'bold',
-    textAlign: 'center',
-    flex: 1,
-    fontSize: 20,
   },
   switchContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginVertical: 10,
+    marginBottom: 20,
   },
   switchButton: {
+    flex: 1,
     paddingVertical: 10,
-    paddingHorizontal: 20,
-    backgroundColor: '#8C7D85',
-    borderRadius: 5,
-    marginHorizontal: 5,
+    alignItems: 'center',
+    borderBottomWidth: 2,
+    borderBottomColor: 'transparent',
   },
   activeButton: {
-    backgroundColor: '#4A4E69',
+    borderBottomColor: '#4A4E69',
   },
   switchButtonText: {
-    color: '#FFF',
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#4A4E69',
+  },
+  card: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 20,
+    marginBottom: 20,
+    elevation: 2,
+  },
+  cardImage: {
+    width: '100%',
+    height: 150,
+    marginBottom: 10,
+    borderRadius: 10,
+  },
+  cardText: {
+    fontSize: 16,
+    marginBottom: 10,
+    color: '#22223B',
+  },
+  boldText: {
+    fontWeight: 'bold',
+  },
+  movimientosButton: {
+    backgroundColor: '#4A4E69',
+    padding: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  movimientosButtonText: {
+    color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
   },
@@ -255,11 +300,49 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 14, // Increased font size for better visibility
   },
-  cardImage: {
-    width: '100%',
-    height: 200,
-    resizeMode: 'cover',
-    borderRadius: 10,
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  openButton: {
+    backgroundColor: '#F194FF',
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2,
+    marginTop: 20,
+  },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
+    fontSize: 16,
+    color: '#22223B',
+  },
+  movimientoContainer: {
+    borderBottomWidth: 1,
+    borderBottomColor: '#CCC',
+    paddingBottom: 10,
     marginBottom: 10,
   },
 });

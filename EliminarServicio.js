@@ -3,6 +3,14 @@ import { View, Text, TouchableOpacity, Image, StyleSheet, TextInput, Button, Scr
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 
+// Componente para mostrar los detalles de un servicio en una tarjeta
+const ServiceCard = ({ servicio, onPress }) => (
+  <TouchableOpacity style={styles.serviceItem} onPress={onPress}>
+    <Text>{servicio.id}</Text>
+    {/* Agrega aquí otros detalles del servicio si es necesario */}
+  </TouchableOpacity>
+);
+
 const EliminarServicio = ({ route, navigation }) => {
   const [idServicioComercio, setIdServicioComercio] = useState('');
   const [idServicioProfesional, setIdServicioProfesional] = useState('');
@@ -19,10 +27,10 @@ const EliminarServicio = ({ route, navigation }) => {
     fetchServiciosProfesionales();
   }, []);
 
-  // Función para obtener los IDs de los servicios de comercio
+  // Función para obtener los servicios de comercio
   const fetchServiciosComercio = async () => {
     try {
-      const response = await axios.get(`http://192.168.0.241:8080/inicio/misServiciosComercio?mail=${encodeURIComponent(mail)}`);
+      const response = await axios.get(`http://192.168.0.241:8080/inicio/misServiciosComercio?mail=${mail}`);
       setServiciosComercio(response.data);
     } catch (error) {
       console.error('Error al obtener los servicios de comercio:', error);
@@ -30,10 +38,10 @@ const EliminarServicio = ({ route, navigation }) => {
     }
   };
 
-  // Función para obtener los IDs de los servicios profesionales
+  // Función para obtener los servicios profesionales
   const fetchServiciosProfesionales = async () => {
     try {
-      const response = await axios.get(`http://192.168.0.241:8080/inicio/misServiciosProfesionales?mail=${encodeURIComponent(mail)}`);
+      const response = await axios.get(`http://192.168.0.241:8080/inicio/misServiciosProfesionales?mail=${mail}`);
       setServiciosProfesionales(response.data);
     } catch (error) {
       console.error('Error al obtener los servicios profesionales:', error);
@@ -44,7 +52,7 @@ const EliminarServicio = ({ route, navigation }) => {
   // Función para eliminar un servicio de comercio por su ID
   const eliminarServicioComercio = async () => {
     try {
-      const url = `http://192.168.0.241:8080/inicio/eliminarServicioComercio?mail=${encodeURIComponent(mail)}&idServicio=${idServicioComercio}`;
+      const url = `http://192.168.0.241:8080/inicio/eliminarServicioComercio?mail=${mail}&idServicio=${idServicioComercio}`;
       const response = await axios.delete(url);
       console.log('Respuesta de eliminación de servicio de comercio:', response.data);
       // Manejar la respuesta del servidor según sea necesario
@@ -57,7 +65,7 @@ const EliminarServicio = ({ route, navigation }) => {
   // Función para eliminar un servicio profesional por su ID
   const eliminarServicioProfesional = async () => {
     try {
-      const url = `http://192.168.0.241:8080/inicio/eliminarServicioProfesional?mail=${encodeURIComponent(mail)}&idServicio=${idServicioProfesional}`;
+      const url = `http://192.168.0.241:8080/inicio/eliminarServicioProfesional?mail=${mail}&idServicio=${idServicioProfesional}`;
       const response = await axios.delete(url);
       console.log('Respuesta de eliminación de servicio profesional:', response.data);
       // Manejar la respuesta del servidor según sea necesario
@@ -83,10 +91,10 @@ const EliminarServicio = ({ route, navigation }) => {
 
       {/* Botones para seleccionar tipo de formulario */}
       <View style={styles.toggleButtons}>
-        <TouchableOpacity style={[styles.toggleButton, mostrarFormularioComercio && styles.activeButton]} onPress={() => {setMostrarFormularioComercio(true); setMostrarFormularioProfesional(false);}}>
+        <TouchableOpacity style={[styles.toggleButton, mostrarFormularioComercio && styles.activeButton]} onPress={() => {setMostrarFormularioComercio(true); setMostrarFormularioProfesional(false); fetchServiciosComercio();}}>
           <Text style={mostrarFormularioComercio ? styles.activeButtonText : styles.buttonText}>Servicio Comercio</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.toggleButton, mostrarFormularioProfesional && styles.activeButton]} onPress={() => {setMostrarFormularioProfesional(true); setMostrarFormularioComercio(false);}}>
+        <TouchableOpacity style={[styles.toggleButton, mostrarFormularioProfesional && styles.activeButton]} onPress={() => {setMostrarFormularioProfesional(true); setMostrarFormularioComercio(false); fetchServiciosProfesionales();}}>
           <Text style={mostrarFormularioProfesional ? styles.activeButtonText : styles.buttonText}>Servicio Profesional</Text>
         </TouchableOpacity>
       </View>
@@ -98,13 +106,11 @@ const EliminarServicio = ({ route, navigation }) => {
             <Text style={styles.subtitle}>Servicios de Comercio Disponibles:</Text>
             <ScrollView style={styles.scrollView} contentContainerStyle={styles.serviceList}>
               {serviciosComercio.map(servicio => (
-                <TouchableOpacity
+                <ServiceCard
                   key={servicio.id}
-                  style={styles.serviceItem}
+                  servicio={servicio}
                   onPress={() => setIdServicioComercio(servicio.id)}
-                >
-                  <Text>{servicio.id}</Text>
-                </TouchableOpacity>
+                />
               ))}
             </ScrollView>
             <TextInput
@@ -122,13 +128,11 @@ const EliminarServicio = ({ route, navigation }) => {
             <Text style={styles.subtitle}>Servicios Profesionales Disponibles:</Text>
             <ScrollView style={styles.scrollView} contentContainerStyle={styles.serviceList}>
               {serviciosProfesionales.map(servicio => (
-                <TouchableOpacity
+                <ServiceCard
                   key={servicio.id}
-                  style={styles.serviceItem}
+                  servicio={servicio}
                   onPress={() => setIdServicioProfesional(servicio.id)}
-                >
-                  <Text>{servicio.id}</Text>
-                </TouchableOpacity>
+                />
               ))}
             </ScrollView>
             <TextInput
