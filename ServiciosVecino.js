@@ -255,8 +255,9 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
   },
   switchButtonText: {
-    color: 'white',
+    color: '#FFF',
     fontSize: 16,
+    fontWeight: 'bold',
   },
   activeButton: {
     backgroundColor: '#4A4E69',
