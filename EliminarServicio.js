@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Image, StatusBar } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Image, StatusBar, Alert } from 'react-native';
 import axios from 'axios';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -34,6 +34,32 @@ const EliminarServicio = ({ route, navigation }) => {
     fetchServiciosProfesionales();
     fetchServiciosComercio();
   }, []);
+
+  // Función para eliminar servicio profesional por ID
+  const eliminarServicioProfesional = async (idServicio) => {
+    try {
+      await axios.delete(`http://localhost:8080/inicio/eliminarServicioProfesional?mail=${mail}&idServicio=${idServicio}`);
+      // Actualizar la lista de servicios profesionales después de eliminar
+      fetchServiciosProfesionales();
+      Alert.alert('Eliminación exitosa', 'El servicio profesional ha sido eliminado.');
+    } catch (error) {
+      console.error('Error al eliminar el servicio profesional:', error);
+      Alert.alert('Error', 'No se pudo eliminar el servicio profesional.');
+    }
+  };
+
+  // Función para eliminar servicio de comercio por ID
+  const eliminarServicioComercio = async (idServicio) => {
+    try {
+      await axios.delete(`http://localhost:8080/inicio/eliminarServicioComercio?mail=${mail}&idServicio=${idServicio}`);
+      // Actualizar la lista de servicios de comercio después de eliminar
+      fetchServiciosComercio();
+      Alert.alert('Eliminación exitosa', 'El servicio de comercio ha sido eliminado.');
+    } catch (error) {
+      console.error('Error al eliminar el servicio de comercio:', error);
+      Alert.alert('Error', 'No se pudo eliminar el servicio de comercio.');
+    }
+  };
 
   // Función para cambiar entre la sección de servicios profesionales y servicios de comercio
   const mostrarServiciosProfesionales = () => {
@@ -80,6 +106,9 @@ const EliminarServicio = ({ route, navigation }) => {
             <Text>Rubro: {servicio.rubro}</Text>
             <Text>Descripción: {servicio.descripcion}</Text>
             <Text>Estado: {servicio.estado}</Text>
+            <TouchableOpacity style={styles.eliminarButton} onPress={() => eliminarServicioProfesional(servicio.idservicioprofesional)}>
+              <Ionicons name="trash-bin" size={24} color="red" />
+            </TouchableOpacity>
           </View>
         ))}
 
@@ -90,6 +119,9 @@ const EliminarServicio = ({ route, navigation }) => {
             <Text>Contacto: {servicio.contacto}</Text>
             <Text>Descripción: {servicio.descripcion}</Text>
             <Text>Estado: {servicio.estado}</Text>
+            <TouchableOpacity style={styles.eliminarButton} onPress={() => eliminarServicioComercio(servicio.idServicioComercio)}>
+              <Ionicons name="trash-bin" size={24} color="red" />
+            </TouchableOpacity>
           </View>
         ))}
       </ScrollView>
@@ -183,6 +215,12 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     borderWidth: 1,
     borderColor: '#ccc',
+    position: 'relative',
+  },
+  eliminarButton: {
+    position: 'absolute',
+    top: 5,
+    right: 5,
   },
   navbar: {
     flexDirection: 'row',
