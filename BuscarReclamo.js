@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 const BuscarReclamo = ({ route, navigation }) => {
   const [reclamoId, setReclamoId] = useState('');
-  const [reclamo, setReclamo] = useState(null);
+  const [reclamos, setReclamos] = useState([]);
   const [imagenes, setImagenes] = useState([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showIndividual, setShowIndividual] = useState(true);
@@ -24,8 +24,8 @@ const BuscarReclamo = ({ route, navigation }) => {
       })
       .then(data => {
         console.log('Datos del reclamo:', data); // Log para verificar los datos recibidos
-        if (data && Object.keys(data).length > 0) {
-          setReclamo(data);
+        if (data && (Array.isArray(data) ? data.length > 0 : Object.keys(data).length > 0)) {
+          setReclamos(Array.isArray(data) ? data : [data]);
           return fetch(`http://localhost:8080/inicio/imagenesReclamo?idReclamo=${reclamoId}`);
         } else {
           throw new Error('No se encontraron datos para este reclamo');
@@ -91,8 +91,8 @@ const BuscarReclamo = ({ route, navigation }) => {
             <Text style={styles.searchButtonText}>Buscar</Text>
           </TouchableOpacity>
         </View>
-        {reclamo && (
-          <View style={styles.reclamoContainer}>
+        {reclamos.length > 0 && reclamos.map((reclamo, index) => (
+          <View key={index} style={styles.reclamoContainer}>
             {imagenes.length > 0 && (
               <View style={styles.imageContainer}>
                 <TouchableOpacity onPress={handlePrevImage}>
@@ -115,7 +115,7 @@ const BuscarReclamo = ({ route, navigation }) => {
             <Text style={styles.reclamoText}>ID Reclamo Unificado: {reclamo.idReclamoUnificado}</Text>
             <Text style={styles.reclamoText}>Descripción: {reclamo.descripcion}</Text>
           </View>
-        )}
+        ))}
       </ScrollView>
       <View style={styles.navbar}>
         <TouchableOpacity style={styles.navButton} onPress={() => navigation.navigate('ServiciosVecino', { mail })}>
@@ -225,55 +225,48 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   reclamoContainer: {
-    padding: 20,
+    marginBottom: 20,
+    padding: 10,
     borderWidth: 1,
     borderColor: '#CCCCCC',
     borderRadius: 5,
-    backgroundColor: '#D3CCE3',
   },
   reclamoText: {
-    marginBottom: 10,
     fontSize: 16,
+    marginBottom: 5,
   },
   imageContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 20,
-  },
-  arrow: {
-    fontSize: 24,
-    marginHorizontal: 10,
-    color: '#4A4E69',
+    marginBottom: 10,
   },
   reclamoImage: {
     width: 200,
     height: 200,
-    resizeMode: 'cover',
-    borderRadius: 5,
+  },
+  arrow: {
+    fontSize: 24,
+    marginHorizontal: 10,
   },
   navbar: {
-    flexDirection: 'row',
-    justifyContent: 'space-around', // Changed from 'space-between' to 'space-around' to reduce space between buttons
     backgroundColor: '#4A4E69',
-    paddingHorizontal: 10, // Reduced paddingHorizontal to make buttons closer
-    paddingVertical: 20, // Increased padding vertical to make the navbar larger
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-  },
-  navButton: {
+    height: 60,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
     alignItems: 'center',
   },
-  icon: {
-    width: 25, // Increased icon size
-    height: 25, // Increased icon size
-    marginBottom: 5, // Reduced marginBottom to make buttons closer
+  navButton: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   navText: {
     color: 'white',
-    fontSize: 14, // Increased font size for better visibility
+    fontSize: 12,
+  },
+  icon: {
+    width: 24,
+    height: 24,
+    marginBottom: 5,
   },
 });
 

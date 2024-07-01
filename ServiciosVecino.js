@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Image, Alert, StyleSheet, StatusBar } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Image, StyleSheet, StatusBar, FlatList, Dimensions } from 'react-native';
 import axios from 'axios';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -13,8 +13,17 @@ const ServiciosVecino = ({ route, navigation }) => {
   useEffect(() => {
     const fetchServiciosComercios = async () => {
       try {
-        const response = await axios.get('http://192.168.0.241:8080/inicio/servicios/comercios');
-        setServiciosComercios(response.data);
+        const response = await axios.get('http://localhost:8080/inicio/servicios/comercios');
+        const comerciosConImagenes = await Promise.all(response.data.map(async (comercio) => {
+          try {
+            const imagenesResponse = await axios.get(`http://localhost:8080/inicio/imagenesServicioComercio?idServicioComercio=${comercio.idServicioComercio}`);
+            return { ...comercio, imagenes: imagenesResponse.data };
+          } catch (error) {
+            console.error('Error fetching imágenes de comercio:', error);
+            return { ...comercio, imagenes: [] };
+          }
+        }));
+        setServiciosComercios(comerciosConImagenes);
       } catch (error) {
         console.error('Error fetching comercios:', error);
       }
@@ -22,8 +31,17 @@ const ServiciosVecino = ({ route, navigation }) => {
 
     const fetchServiciosProfesionales = async () => {
       try {
-        const response = await axios.get('http://192.168.0.241:8080/inicio/servicios/profesionales');
-        setServiciosProfesionales(response.data);
+        const response = await axios.get('http://localhost:8080/inicio/servicios/profesionales');
+        const profesionalesConImagenes = await Promise.all(response.data.map(async (profesional) => {
+          try {
+            const imagenesResponse = await axios.get(`http://localhost:8080/inicio/imagenesServicioProfesional?idServicioProfesional=${profesional.idservicioprofesional}`);
+            return { ...profesional, imagenes: imagenesResponse.data };
+          } catch (error) {
+            console.error('Error fetching imágenes de profesional:', error);
+            return { ...profesional, imagenes: [] };
+          }
+        }));
+        setServiciosProfesionales(profesionalesConImagenes);
       } catch (error) {
         console.error('Error fetching profesionales:', error);
       }
@@ -41,9 +59,22 @@ const ServiciosVecino = ({ route, navigation }) => {
 
   const renderCard = (servicio, index) => (
     <View key={index} style={styles.card}>
-      <Image source={require('./assets/luzRota.jpeg')} style={styles.cardImage} />
+      {servicio.imagenes.length > 0 ? (
+        <FlatList
+          data={servicio.imagenes}
+          horizontal
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item }) => (
+            <Image source={{ uri: item }} style={styles.cardImage} />
+          )}
+          showsHorizontalScrollIndicator={false}
+        />
+      ) : (
+        <Image source={require('./assets/luzRota.jpeg')} style={styles.cardImage} />
+      )}
       {servicio.nombre !== undefined && (
         <View style={{ flexDirection: "column" }}>
+          <Text style={styles.cardText}><Text style={styles.boldText}>ID:</Text> {servicio.idservicioprofesional}</Text>
           <Text style={styles.cardText}><Text style={styles.boldText}>Responsable:</Text> {servicio.apellido + " " + servicio.nombre}</Text>
           <Text style={styles.cardText}><Text style={styles.boldText}>Horario:</Text> {servicio.horario}</Text>
           <Text style={styles.cardText}><Text style={styles.boldText}>Rubro:</Text> {servicio.rubro}</Text>
@@ -51,6 +82,7 @@ const ServiciosVecino = ({ route, navigation }) => {
       )}
       {servicio.direccion !== undefined && (
         <View style={{ flexDirection: "column" }}>
+          <Text style={styles.cardText}><Text style={styles.boldText}>ID:</Text> {servicio.idServicioComercio}</Text>
           <Text style={styles.cardText}><Text style={styles.boldText}>Dirección:</Text> {servicio.direccion}</Text>
         </View>
       )}
@@ -175,83 +207,83 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: '#8C7D85',
     borderRadius: 10,
-    padding: 15,
-    marginBottom: 20,
+    padding: 10,
+    marginBottom: 10,
   },
   cardText: {
-    color: '#FFF',
-    marginBottom: 5,
+    fontSize: 16,
+    color: 'white',
+  },
+  cardImage: {
+    width: Dimensions.get('window').width - 60,
+    height: 200,
+    borderRadius: 10,
+    marginBottom: 10,
   },
   boldText: {
     fontWeight: 'bold',
   },
   buttonContainer: {
-    marginVertical: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginVertical: 15,
   },
   actionButton: {
-    backgroundColor: '#8C7D85',
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 10,
+    backgroundColor: '#22223B',
+    padding: 10,
+    borderRadius: 5,
     flexDirection: 'row',
     alignItems: 'center',
   },
   buttonText: {
-    color: '#FFF',
-    fontWeight: 'bold',
-    textAlign: 'center',
-    flex: 1,
-    fontSize: 20,
+    color: 'white',
+    marginLeft: 5,
+  },
+  buttonIcon: {
+    marginRight: 5,
   },
   switchContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginVertical: 10,
+    marginBottom: 20,
   },
   switchButton: {
     paddingVertical: 10,
     paddingHorizontal: 20,
-    backgroundColor: '#8C7D85',
     borderRadius: 5,
+    backgroundColor: '#22223B',
     marginHorizontal: 5,
+  },
+  switchButtonText: {
+    color: 'white',
+    fontSize: 16,
   },
   activeButton: {
     backgroundColor: '#4A4E69',
   },
-  switchButtonText: {
-    color: '#FFF',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
   navbar: {
-    flexDirection: 'row',
-    justifyContent: 'space-around', // Changed from 'space-between' to 'space-around' to reduce space between buttons
-    backgroundColor: '#4A4E69',
-    paddingHorizontal: 10, // Reduced paddingHorizontal to make buttons closer
-    paddingVertical: 20, // Increased padding vertical to make the navbar larger
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
+    height: 60,
+    backgroundColor: '#4A4E69',
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    paddingHorizontal: 20,
   },
   navButton: {
     alignItems: 'center',
   },
   icon: {
-    width: 25, // Increased icon size
-    height: 25, // Increased icon size
-    marginBottom: 5, // Reduced marginBottom to make buttons closer
+    width: 24,
+    height: 24,
+    marginBottom: 2,
   },
   navText: {
     color: 'white',
-    fontSize: 14, // Increased font size for better visibility
-  },
-  cardImage: {
-    width: '100%',
-    height: 200,
-    resizeMode: 'cover',
-    borderRadius: 10,
-    marginBottom: 10,
+    fontSize: 12,
   },
 });
 

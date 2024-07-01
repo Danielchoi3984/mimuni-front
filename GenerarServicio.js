@@ -100,7 +100,7 @@ const GenerarServicio = ({ route, navigation }) => {
           <TextInput style={styles.input} placeholder="Descripción" multiline={true} maxLength={1000} value={descripcion} onChangeText={setDescripcion} />
           <Button title="Seleccionar imágenes" onPress={pickImage} />
           
-          <Button title="Enviar formulario" onPress={submitForm} />
+          <Button title="Generar servicio" onPress={submitForm} />
         </View>
       </ScrollView>
 

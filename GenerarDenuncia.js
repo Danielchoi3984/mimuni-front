@@ -68,45 +68,60 @@ const GenerarDenuncia = ({ route, navigation }) => {
   };
 
   const uploadData = async () => {
-    try {
-      const formData = new FormData();
-      formData.append('mail', mail);
-      formData.append('dniDenunciado', documento);
-      formData.append('idSitio', parseInt(sitio));
-      formData.append('descripcion', descripcion);
-  
-      images.forEach((image, index) => {
-        formData.append('files', {
-          uri: image.uri,
-          name: `foto_${index}.jpg`,
-          type: 'image/jpeg',
-        });
-      });
-  
-      const response = await axios.post('http://localhost:8080/inicio/crearDenuncia', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
+    Alert.alert(
+      'Confirmación',
+      'Señor usuario, ¿acepta que todo lo mencionado en esta denuncia es verdad?',
+      [
+        {
+          text: 'Cancelar',
+          style: 'cancel'
         },
-      });
-  
-      console.log('Imágenes y datos subidos exitosamente:', response.data);
-  
-      // Mostrar el número de denuncia en un Alert si la respuesta es exitosa
-      Alert.alert('Éxito', response.data);
-  
-    } catch (error) {
-      console.error('Error al subir imágenes y datos:', error);
-      if (error.response) {
-        console.log('Datos de respuesta de error:', error.response.data);
-        console.log('Estado de respuesta de error:', error.response.status);
-        console.log('Encabezados de respuesta de error:', error.response.headers);
-      } else if (error.request) {
-        console.log('Datos de solicitud de error:', error.request);
-      } else {
-        console.log('Mensaje de error:', error.message);
-      }
-      Alert.alert('Error', 'Error al subir imágenes y datos: ' + error.message);
-    }
+        {
+          text: 'Acepto responsabilidad',
+          onPress: async () => {
+            try {
+              const formData = new FormData();
+              formData.append('mail', mail);
+              formData.append('dniDenunciado', documento);
+              formData.append('idSitio', parseInt(sitio));
+              formData.append('descripcion', descripcion);
+          
+              images.forEach((image, index) => {
+                formData.append('files', {
+                  uri: image.uri,
+                  name: `foto_${index}.jpg`,
+                  type: 'image/jpeg',
+                });
+              });
+          
+              const response = await axios.post('http://localhost:8080/inicio/crearDenuncia', formData, {
+                headers: {
+                  'Content-Type': 'multipart/form-data',
+                },
+              });
+          
+              console.log('Imágenes y datos subidos exitosamente:', response.data);
+          
+              // Mostrar el número de denuncia en un Alert si la respuesta es exitosa
+              Alert.alert('Éxito', response.data);
+          
+            } catch (error) {
+              console.error('Error al subir imágenes y datos:', error);
+              if (error.response) {
+                console.log('Datos de respuesta de error:', error.response.data);
+                console.log('Estado de respuesta de error:', error.response.status);
+                console.log('Encabezados de respuesta de error:', error.response.headers);
+              } else if (error.request) {
+                console.log('Datos de solicitud de error:', error.request);
+              } else {
+                console.log('Mensaje de error:', error.message);
+              }
+              Alert.alert('Error', 'Error al subir imágenes y datos: ' + error.message);
+            }
+          }
+        }
+      ]
+    );
   };
 
   return (
@@ -142,7 +157,7 @@ const GenerarDenuncia = ({ route, navigation }) => {
         />
         <Button title="Seleccionar imagen de la galería" onPress={pickImage} />
         <Button title="Tomar una foto" onPress={takePhoto} />
-        <Button title="Subir imágenes" onPress={uploadData} />
+        <Button title="Enviar denuncia" onPress={uploadData} />
         {images.map((image, index) => (
           <Image key={index} source={{ uri: image.uri }} style={styles.image} />
         ))}
