@@ -90,27 +90,22 @@ const ReclamosInspector = ({ route, navigation }) => {
           },
         });
   
-        // Verificar el estado de la respuesta
         if (!response.ok) {
           throw new Error(`Error uploading image: ${response.status} - ${response.statusText}`);
         }
   
-        // Manejar la respuesta (puede no ser JSON)
-        const responseData = await response.text(); // Obtener el texto de la respuesta
+        const responseData = await response.text(); 
         console.log('Image added successfully:', responseData);
         Alert.alert("Exito", responseData);
   
-        // Actualizar el estado de imágenes
-        setImagenesReclamo({}); // Limpiar el estado de imágenes para forzar la recarga
-        fetchReclamos(); // Actualizar la lista de reclamos después de agregar la imagen
+        setImagenesReclamo({}); 
+        fetchReclamos(); 
       }
     } catch (error) {
       console.error('Error uploading image:', error.message);
-      // Aquí podrías mostrar una alerta o un mensaje de error según sea necesario
     }
   };
   
-
   const showAlert = () => {
     Alert.alert(
       'Acceso Restringido',
@@ -161,7 +156,7 @@ const ReclamosInspector = ({ route, navigation }) => {
                 )}
                 ListEmptyComponent={() => (
                   <Image
-                    source={require("./assets/luzRota.jpeg")} // Imagen por defecto cuando no hay imágenes
+                    source={require("./assets/luzRota.jpeg")} 
                     style={styles.cardImage}
                   />
                 )}
@@ -392,10 +387,10 @@ const styles = StyleSheet.create({
   },
   navbar: {
     flexDirection: 'row',
-    justifyContent: 'space-around', // Changed from 'space-between' to 'space-around' to reduce space between buttons
+    justifyContent: 'space-around', 
     backgroundColor: '#4A4E69',
-    paddingHorizontal: 10, // Reduced paddingHorizontal to make buttons closer
-    paddingVertical: 20, // Increased padding vertical to make the navbar larger
+    paddingHorizontal: 10, 
+    paddingVertical: 20, 
     position: 'absolute',
     bottom: 0,
     left: 0,
@@ -405,13 +400,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   icon: {
-    width: 25, // Increased icon size
-    height: 25, // Increased icon size
-    marginBottom: 5, // Reduced marginBottom to make buttons closer
+    width: 25, 
+    height: 25, 
+    marginBottom: 5, 
   },
   navText: {
     color: 'white',
-    fontSize: 14, // Increased font size for better visibility
+    fontSize: 14, 
   },
 });
 

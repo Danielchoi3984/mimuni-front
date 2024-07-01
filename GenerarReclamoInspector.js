@@ -33,10 +33,10 @@ export default function GenerarReclamoInspector({ route, navigation }) {
   const getDesperfectos = async () => {
     try {
       const response = await axios.get(`http://192.168.0.241:8080/inicio/desperfectosPorSector?legajo=${legajo}`);
-      console.log('Respuesta de desperfectosPorSector:', response.data); // Verifica la respuesta aquí
+      console.log('Respuesta de desperfectosPorSector:', response.data); 
 
       if (Array.isArray(response.data)) {
-        setDesperfectos(response.data); // Si la respuesta es un array, asigna al estado desperfectos
+        setDesperfectos(response.data); 
       } else {
         console.error('Error: La respuesta no es un array válido.');
         Alert.alert('Error', 'Error al obtener desperfectos: La respuesta no es un array válido.');
@@ -89,12 +89,12 @@ export default function GenerarReclamoInspector({ route, navigation }) {
   };
 
   const selectSitio = (sitio) => {
-    setIdSitio(sitio.idSitio.toString());  // Aquí solo guardamos el ID
+    setIdSitio(sitio.idSitio.toString()); 
     setModalVisible(false);
   };
 
   const selectDesperfecto = (desperfecto) => {
-    setIdDesperfecto(desperfecto.idDesperfecto.toString());  // Aquí solo guardamos el ID
+    setIdDesperfecto(desperfecto.idDesperfecto.toString()); 
     setModalVisible(false);
   };
 
@@ -103,8 +103,8 @@ export default function GenerarReclamoInspector({ route, navigation }) {
       const formData = new FormData();
 
       formData.append('legajo', legajo);
-      formData.append('idSitio', parseInt(idSitio));  // Convertimos a entero antes de enviar
-      formData.append('idDesperfecto', parseInt(idDesperfecto));  // Convertimos a entero antes de enviar
+      formData.append('idSitio', parseInt(idSitio));  
+      formData.append('idDesperfecto', parseInt(idDesperfecto));  
       formData.append('descripcion', descripcion);
 
       images.forEach((image, index) => {

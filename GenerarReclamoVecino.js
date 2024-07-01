@@ -82,12 +82,12 @@ export default function GenerarReclamoVecino({ route, navigation }) {
   };
 
   const selectSitio = (sitio) => {
-    setIdSitio(sitio.idSitio.toString());  // Aquí solo guardamos el ID
+    setIdSitio(sitio.idSitio.toString());  
     setModalVisible(false);
   };
 
   const selectDesperfecto = (desperfecto) => {
-    setIdDesperfecto(desperfecto.idDesperfecto.toString());  // Aquí solo guardamos el ID
+    setIdDesperfecto(desperfecto.idDesperfecto.toString());  
     setModalVisible(false);
   };
 
@@ -96,8 +96,8 @@ export default function GenerarReclamoVecino({ route, navigation }) {
       const formData = new FormData();
 
       formData.append('mail', mail);
-      formData.append('idSitio', parseInt(idSitio));  // Convertimos a entero antes de enviar
-      formData.append('idDesperfecto', parseInt(idDesperfecto));  // Convertimos a entero antes de enviar
+      formData.append('idSitio', parseInt(idSitio));  
+      formData.append('idDesperfecto', parseInt(idDesperfecto));  
       formData.append('descripcion', descripcion);
 
       images.forEach((image, index) => {
@@ -257,10 +257,10 @@ const styles = StyleSheet.create({
   },
   navbar: {
     flexDirection: 'row',
-    justifyContent: 'space-around', // Changed from 'space-between' to 'space-around' to reduce space between buttons
+    justifyContent: 'space-around', 
     backgroundColor: '#4A4E69',
-    paddingHorizontal: 10, // Reduced paddingHorizontal to make buttons closer
-    paddingVertical: 20, // Increased padding vertical to make the navbar larger
+    paddingHorizontal: 10, 
+    paddingVertical: 20, 
     position: 'absolute',
     bottom: 0,
     left: 0,
@@ -270,13 +270,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   icon: {
-    width: 25, // Increased icon size
-    height: 25, // Increased icon size
-    marginBottom: 5, // Reduced marginBottom to make buttons closer
+    width: 25, 
+    height: 25, 
+    marginBottom: 5, 
   },
   navText: {
     color: 'white',
-    fontSize: 14, // Increased font size for better visibility
+    fontSize: 14, // 
   },
   centeredView: {
     flex: 1,

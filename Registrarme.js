@@ -17,12 +17,11 @@ const Registrarme = ({ navigation }) => {
     const url = 'http://192.168.0.241:8080/inicio/register';
     axios.post(url, formData)
       .then(response => {
-        const data = response.data; // Aquí obtenemos los datos de la respuesta
+        const data = response.data; 
         if (data === 'Registro exitoso') {
           Alert.alert('Registro exitoso', 'Se le ha enviado un mail con cu contraseña provisoria.', [
             {
               text: 'OK',
-              // onPress: () => navigation.navigate('ServiciosVecino'),
             },
           ]);
         }else {

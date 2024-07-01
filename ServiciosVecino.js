@@ -265,10 +265,10 @@ const styles = StyleSheet.create({
   },
   navbar: {
     flexDirection: 'row',
-    justifyContent: 'space-around', // Changed from 'space-between' to 'space-around' to reduce space between buttons
+    justifyContent: 'space-around', 
     backgroundColor: '#4A4E69',
-    paddingHorizontal: 10, // Reduced paddingHorizontal to make buttons closer
-    paddingVertical: 20, // Increased padding vertical to make the navbar larger
+    paddingHorizontal: 10, 
+    paddingVertical: 20, 
     position: 'absolute',
     bottom: 0,
     left: 0,

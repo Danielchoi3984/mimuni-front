@@ -13,7 +13,7 @@ const GenerarServicio = ({ route, navigation }) => {
 
   const { mail } = route.params || {};
 
-  // Función para seleccionar imágenes desde la galería
+  // seleccionar imágenes desde la galería
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -30,7 +30,7 @@ const GenerarServicio = ({ route, navigation }) => {
     }
   };
 
-  // Función para subir el formulario de comercio o profesional
+  //  subir el formulario de comercio o profesional
   const submitForm = async () => {
     try {
       const formData = new FormData();
@@ -42,8 +42,8 @@ const GenerarServicio = ({ route, navigation }) => {
         formData.append('contacto', medioContacto);
       } else if (formType === 'profesional') {
         formData.append('medioContacto', medioContacto);
-        formData.append('horario', medioContacto); // Ajustar según sea necesario
-        formData.append('rubro', 'EjemploRubro'); // Ajustar según sea necesario
+        formData.append('horario', medioContacto); 
+        formData.append('rubro', 'EjemploRubro'); 
       }
 
       fotos.forEach((image, index) => {
@@ -182,7 +182,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingBottom: 100, // Espacio adicional para el navbar fijo
+    paddingBottom: 100, 
   },
   input: {
     height: 40,
@@ -206,10 +206,10 @@ const styles = StyleSheet.create({
   },
   navbar: {
     flexDirection: 'row',
-    justifyContent: 'space-around', // Changed from 'space-between' to 'space-around' to reduce space between buttons
+    justifyContent: 'space-around', 
     backgroundColor: '#4A4E69',
-    paddingHorizontal: 10, // Reduced paddingHorizontal to make buttons closer
-    paddingVertical: 20, // Increased padding vertical to make the navbar larger
+    paddingHorizontal: 10, 
+    paddingVertical: 20, 
     position: 'absolute',
     bottom: 0,
     left: 0,

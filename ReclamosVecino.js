@@ -26,7 +26,7 @@ const ReclamosVecino = ({ route, navigation }) => {
         if (Array.isArray(data)) {
           setReclamos(data);
           data.forEach(reclamo => {
-            fetchImagenesReclamo(reclamo.idReclamo); // Llamar a la función para obtener imágenes
+            fetchImagenesReclamo(reclamo.idReclamo); 
           });
         } else {
           setReclamos([]);
@@ -92,8 +92,8 @@ const ReclamosVecino = ({ route, navigation }) => {
           .then(response => response.json())
           .then(data => {
             console.log('Image added successfully:', data);
-            setImagenesReclamo({}); // Limpiar el estado de imágenes para forzar la recarga
-            fetchReclamos(); // Actualizar la lista de reclamos después de agregar la imagen
+            setImagenesReclamo({}); 
+            fetchReclamos(); 
           })
           .catch(error => console.error('Error uploading image:', error));
       }
@@ -104,8 +104,8 @@ const ReclamosVecino = ({ route, navigation }) => {
   
 
   const clearCacheAndFetchReclamos = () => {
-    setImagenesReclamo({}); // Limpiar el estado de imágenes para forzar la recarga
-    fetchReclamos(); // Actualizar la lista de reclamos después de limpiar la caché
+    setImagenesReclamo({}); 
+    fetchReclamos(); 
   };
 
   return (
@@ -265,7 +265,7 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     paddingHorizontal: 20,
     borderRadius: 5,
-    justifyContent: 'center', // Centrar contenido horizontalmente
+    justifyContent: 'center', 
   },
   buttonIcon: {
     marginRight: 10,
@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
-    textAlign: 'center', // Centrar texto
+    textAlign: 'center', 
   },
 
   switchContainer: {
@@ -368,10 +368,10 @@ const styles = StyleSheet.create({
   },
   navbar: {
     flexDirection: 'row',
-    justifyContent: 'space-around', // Changed from 'space-between' to 'space-around' to reduce space between buttons
+    justifyContent: 'space-around', 
     backgroundColor: '#4A4E69',
-    paddingHorizontal: 10, // Reduced paddingHorizontal to make buttons closer
-    paddingVertical: 20, // Increased padding vertical to make the navbar larger
+    paddingHorizontal: 10, 
+    paddingVertical: 20, 
     position: 'absolute',
     bottom: 0,
     left: 0,
@@ -381,13 +381,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   icon: {
-    width: 25, // Increased icon size
-    height: 25, // Increased icon size
-    marginBottom: 5, // Reduced marginBottom to make buttons closer
+    width: 25, 
+    height: 25, 
+    marginBottom: 5, 
   },
   navText: {
     color: 'white',
-    fontSize: 14, // Increased font size for better visibility
+    fontSize: 14, 
   },
   cardImage: {
     width: '100%',

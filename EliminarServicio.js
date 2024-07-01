@@ -7,10 +7,9 @@ const EliminarServicio = ({ route, navigation }) => {
   const [mail] = useState(route.params.mail);
   const [serviciosProfesionales, setServiciosProfesionales] = useState([]);
   const [serviciosComercio, setServiciosComercio] = useState([]);
-  const [mostrarProfesionales, setMostrarProfesionales] = useState(true); // Estado para mostrar servicios profesionales
-  const [mostrarComercio, setMostrarComercio] = useState(false); // Estado para mostrar servicios de comercio
+  const [mostrarProfesionales, setMostrarProfesionales] = useState(true); 
+  const [mostrarComercio, setMostrarComercio] = useState(false); 
 
-  // Obtener los servicios profesionales
   const fetchServiciosProfesionales = async () => {
     try {
       const response = await axios.get(`http://localhost:8080/inicio/misServiciosProfesionales?mail=${mail}`);
@@ -20,7 +19,6 @@ const EliminarServicio = ({ route, navigation }) => {
     }
   };
 
-  // Obtener los servicios de comercio
   const fetchServiciosComercio = async () => {
     try {
       const response = await axios.get(`http://localhost:8080/inicio/misServiciosComercio?mail=${mail}`);
@@ -47,7 +45,6 @@ const EliminarServicio = ({ route, navigation }) => {
             text: 'Eliminar',
             onPress: async () => {
               await axios.delete(`http://localhost:8080/inicio/eliminarServicioProfesional?mail=${mail}&idServicio=${idServicio}`);
-              // Actualizar la lista de servicios profesionales después de eliminar
               fetchServiciosProfesionales();
               Alert.alert('Eliminación exitosa', 'El servicio profesional ha sido eliminado.');
             },
@@ -61,7 +58,6 @@ const EliminarServicio = ({ route, navigation }) => {
     }
   };
 
-  // Función para eliminar servicio de comercio por ID
   const eliminarServicioComercio = async (idServicio) => {
     try {
       Alert.alert(
@@ -73,7 +69,6 @@ const EliminarServicio = ({ route, navigation }) => {
             text: 'Eliminar',
             onPress: async () => {
               await axios.delete(`http://localhost:8080/inicio/eliminarServicioComercio?mail=${mail}&idServicio=${idServicio}`);
-              // Actualizar la lista de servicios de comercio después de eliminar
               fetchServiciosComercio();
               Alert.alert('Eliminación exitosa', 'El servicio de comercio ha sido eliminado.');
             },
@@ -87,7 +82,6 @@ const EliminarServicio = ({ route, navigation }) => {
     }
   };
 
-  // Función para cambiar entre la sección de servicios profesionales y servicios de comercio
   const mostrarServiciosProfesionales = () => {
     setMostrarProfesionales(true);
     setMostrarComercio(false);
@@ -152,7 +146,6 @@ const EliminarServicio = ({ route, navigation }) => {
         ))}
       </ScrollView>
 
-      {/* Navbar */}
       <View style={styles.navbar}>
         <TouchableOpacity style={styles.navButton} onPress={() => navigation.navigate('ServiciosVecino', { mail })}>
           <Image source={require('./assets/servicios.png')} style={styles.icon} />
@@ -233,7 +226,7 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
-    marginBottom: 80, // Adjusted marginBottom to accommodate navbar
+    marginBottom: 80, 
   },
   servicioContainer: {
     marginBottom: 10,

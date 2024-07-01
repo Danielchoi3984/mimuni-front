@@ -19,11 +19,10 @@ const DenunciasVecino = ({ route, navigation }) => {
       const response = await axios.get(`http://localhost:8080/inicio/denunciasRecibidas?mail=${mail}`);
       const denuncias = response.data;
 
-      // Fetch images for each denuncia
       const denunciasConImagenes = await Promise.all(denuncias.map(async (denuncia) => {
         const imagenesResponse = await axios.get(`http://localhost:8080/inicio/imagenesDenuncia?idDenuncia=${denuncia.idDenuncias}`);
         const imagenes = imagenesResponse.data;
-        return { ...denuncia, imagenes }; // Store all images in the denuncia object
+        return { ...denuncia, imagenes }; 
       }));
 
       setDenunciasRecibidas(denunciasConImagenes);
@@ -37,11 +36,10 @@ const DenunciasVecino = ({ route, navigation }) => {
       const response = await axios.get(`http://localhost:8080/inicio/denunciasRealizadas?mail=${mail}`);
       const denuncias = response.data;
 
-      // Fetch images for each denuncia
       const denunciasConImagenes = await Promise.all(denuncias.map(async (denuncia) => {
         const imagenesResponse = await axios.get(`http://localhost:8080/inicio/imagenesDenuncia?idDenuncia=${denuncia.idDenuncias}`);
         const imagenes = imagenesResponse.data;
-        return { ...denuncia, imagenes }; // Store all images in the denuncia object
+        return { ...denuncia, imagenes }; 
       }));
 
       setDenunciasRealizadas(denunciasConImagenes);

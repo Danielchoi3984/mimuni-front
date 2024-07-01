@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, StatusBar, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import axios from 'axios'; // Importar Axios
+import axios from 'axios'; 
 
 const OlvideContrasenia = ({ navigation }) => {
   const [correo, setCorreo] = useState('');

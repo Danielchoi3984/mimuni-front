@@ -54,7 +54,7 @@ const PerfilVecino = ({ route, navigation }) => {
   };
 
   const handleLogout = () => {
-    navigation.navigate('LoginVecino'); // Ajusta esto según el nombre de tu pantalla de inicio de sesión
+    navigation.navigate('LoginVecino'); 
   };
 
   if (!perfil) {
@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F2E9E4',
   },
   scrollContainer: {
-    paddingBottom: 100, // Padding bottom to prevent content from being hidden behind navbar
+    paddingBottom: 100, 
   },
   header: {
     backgroundColor: '#4A4E69',
@@ -241,10 +241,10 @@ const styles = StyleSheet.create({
   },
   navbar: {
     flexDirection: 'row',
-    justifyContent: 'space-around', // Changed from 'space-between' to 'space-around' to reduce space between buttons
+    justifyContent: 'space-around', 
     backgroundColor: '#4A4E69',
-    paddingHorizontal: 10, // Reduced paddingHorizontal to make buttons closer
-    paddingVertical: 20, // Increased padding vertical to make the navbar larger
+    paddingHorizontal: 10, 
+    paddingVertical: 20, 
     position: 'absolute',
     bottom: 0,
     left: 0,
@@ -254,13 +254,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   icon: {
-    width: 25, // Increased icon size
-    height: 25, // Increased icon size
-    marginBottom: 5, // Reduced marginBottom to make buttons closer
+    width: 25, 
+    height: 25, 
+    marginBottom: 5,
   },
   navText: {
     color: 'white',
-    fontSize: 14, // Increased font size for better visibility
+    fontSize: 14, 
   },
 });
 

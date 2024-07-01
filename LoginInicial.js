@@ -17,15 +17,15 @@ const LoginInicial = () => {
   const navigation = useNavigation();
 
   const handleBackPress = () => {
-    navigation.goBack(); // Navegar a la pantalla anterior
+    navigation.goBack();
   };
 
   const handleVecinoPress = () => {
-    navigation.navigate('LoginVecino'); // Navegar a la pantalla de LoginVecino
+    navigation.navigate('LoginVecino'); 
   };
 
   const handleInspectorPress = () => {
-    navigation.navigate('LoginInspector'); // Navegar a la pantalla de LoginInspector
+    navigation.navigate('LoginInspector'); 
   };
 
 
