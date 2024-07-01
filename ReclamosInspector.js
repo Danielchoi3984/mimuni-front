@@ -219,17 +219,21 @@ const ReclamosInspector = ({ route, navigation }) => {
         </View>
       </Modal>
       <View style={styles.navbar}>
-        <TouchableOpacity style={styles.navButton} onPress={() => navigation.navigate('PerfilInspector')}>
-          <Ionicons name="person-circle-outline" size={24} color="white" />
-          <Text style={styles.navText}>Perfil</Text>
+        <TouchableOpacity style={styles.navButton}>
+          <Image source={require('./assets/servicios.png')} style={styles.icon} />
+          <Text style={styles.navText}>Servicios</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.navButton}onPress={() => navigation.navigate('ReclamosInspector', { legajo })}>
+          <Image source={require('./assets/reclamos.png')} style={styles.icon} />
+          <Text style={styles.navText}>Reclamos</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.navButton} onPress={() => showAlert()}>
-          <Ionicons name="document-outline" size={24} color="white" />
-          <Text style={styles.navText}>Generar Denuncia</Text>
+          <Image source={require('./assets/denuncias.png')} style={styles.icon} />
+          <Text style={styles.navText}>Denuncias</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.navButton} onPress={() => navigation.navigate('ServiciosInspector')}>
-          <Ionicons name="list-outline" size={24} color="white" />
-          <Text style={styles.navText}>Servicios</Text>
+        <TouchableOpacity style={styles.navButton} onPress={() => navigation.navigate('PerfilInspector', { legajo })}>
+          <Image source={require('./assets/perfil.png')} style={styles.icon} />
+          <Text style={styles.navText}>Perfil</Text>
         </TouchableOpacity>
       </View>
     </View>
