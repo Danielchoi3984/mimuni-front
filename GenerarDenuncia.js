@@ -136,31 +136,35 @@ const GenerarDenuncia = ({ route, navigation }) => {
       </View>
 
       <View style={styles.content}>
-        <Text style={styles.label}>Documento:</Text>
+        <Text style={styles.title}>Generar Denuncia</Text>
+        <Text style={styles.label}>Documento</Text>
         <TextInput
           style={styles.input}
           value={documento}
           onChangeText={setDocumento}
           placeholder="Ingrese el documento"
         />
+        <Text style={styles.label}>Sitio</Text>
         <TouchableOpacity style={styles.input} onPress={handleSitioPress}>
           <Text>{sitio ? `Sitio ID: ${sitio}` : 'Seleccionar Sitio'}</Text>
         </TouchableOpacity>
-        <Text style={styles.label}>Descripción:</Text>
+        <Text style={styles.label}>Descripción (Máximo 1000 caracteres)</Text>
         <TextInput
           style={[styles.input, { height: 100 }]}
           value={descripcion}
           onChangeText={setDescripcion}
-          placeholder="Ingrese la descripción (máximo 1000 caracteres)"
+          placeholder="Ingrese la descripción"
           multiline
           maxLength={1000}
         />
-        <Button title="Seleccionar imagen de la galería" onPress={pickImage} />
-        <Button title="Tomar una foto" onPress={takePhoto} />
-        <Button title="Enviar denuncia" onPress={uploadData} />
-        {images.map((image, index) => (
-          <Image key={index} source={{ uri: image.uri }} style={styles.image} />
-        ))}
+        <Text style={styles.label}>Fotos (0/5)</Text>
+        <TouchableOpacity style={[styles.input, styles.imageInput]} onPress={pickImage}>
+          <Ionicons name="camera" size={24} color="#000" />
+          <Text>Agregar Imagen</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.submitButton} onPress={uploadData}>
+          <Text style={styles.submitButtonText}>Aceptar</Text>
+        </TouchableOpacity>
       </View>
 
       <Modal
@@ -212,7 +216,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F8F8F8',
-    paddingTop: 0,
   },
   header: {
     backgroundColor: '#4A4E69',
@@ -228,42 +231,45 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
   },
-  backIcon: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   content: {
     flex: 1,
     padding: 20,
   },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
   label: {
     fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 5,
+    marginBottom: 10,
   },
   input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
+    backgroundColor: '#FFFFFF',
     borderRadius: 5,
     padding: 10,
-    marginBottom: 20,
+    marginBottom: 15,
   },
-  button: {
+  imageInput: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  checkboxContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  submitButton: {
     backgroundColor: '#4A4E69',
     padding: 15,
     borderRadius: 5,
     alignItems: 'center',
-    marginBottom: 20,
   },
-  buttonText: {
-    color: 'white',
-    fontWeight: 'bold',
-  },
-  image: {
-    width: 100,
-    height: 100,
-    marginRight: 10,
-    marginBottom: 10,
+  submitButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
   },
   centeredView: {
     flex: 1,
@@ -289,8 +295,6 @@ const styles = StyleSheet.create({
   modalText: {
     marginBottom: 15,
     textAlign: 'center',
-    fontSize: 18,
-    fontWeight: 'bold',
   },
   sitioItem: {
     padding: 10,
@@ -300,25 +304,21 @@ const styles = StyleSheet.create({
   navbar: {
     flexDirection: 'row',
     justifyContent: 'space-around',
+    alignItems: 'center',
     backgroundColor: '#4A4E69',
-    paddingHorizontal: 10,
-    paddingVertical: 20,
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
+    paddingVertical: 10,
   },
   navButton: {
     alignItems: 'center',
   },
   icon: {
-    width: 25,
-    height: 25,
+    width: 24,
+    height: 24,
     marginBottom: 5,
   },
   navText: {
-    color: 'white',
-    fontSize: 14,
+    color: '#FFFFFF',
+    fontSize: 12,
   },
 });
 
