@@ -38,10 +38,23 @@ const EliminarServicio = ({ route, navigation }) => {
   // Función para eliminar servicio profesional por ID
   const eliminarServicioProfesional = async (idServicio) => {
     try {
-      await axios.delete(`http://localhost:8080/inicio/eliminarServicioProfesional?mail=${mail}&idServicio=${idServicio}`);
-      // Actualizar la lista de servicios profesionales después de eliminar
-      fetchServiciosProfesionales();
-      Alert.alert('Eliminación exitosa', 'El servicio profesional ha sido eliminado.');
+      Alert.alert(
+        'Confirmar eliminación',
+        '¿Estás seguro de que quieres eliminar este servicio profesional?',
+        [
+          { text: 'Cancelar', style: 'cancel' },
+          {
+            text: 'Eliminar',
+            onPress: async () => {
+              await axios.delete(`http://localhost:8080/inicio/eliminarServicioProfesional?mail=${mail}&idServicio=${idServicio}`);
+              // Actualizar la lista de servicios profesionales después de eliminar
+              fetchServiciosProfesionales();
+              Alert.alert('Eliminación exitosa', 'El servicio profesional ha sido eliminado.');
+            },
+          },
+        ],
+        { cancelable: false }
+      );
     } catch (error) {
       console.error('Error al eliminar el servicio profesional:', error);
       Alert.alert('Error', 'No se pudo eliminar el servicio profesional.');
@@ -51,10 +64,23 @@ const EliminarServicio = ({ route, navigation }) => {
   // Función para eliminar servicio de comercio por ID
   const eliminarServicioComercio = async (idServicio) => {
     try {
-      await axios.delete(`http://localhost:8080/inicio/eliminarServicioComercio?mail=${mail}&idServicio=${idServicio}`);
-      // Actualizar la lista de servicios de comercio después de eliminar
-      fetchServiciosComercio();
-      Alert.alert('Eliminación exitosa', 'El servicio de comercio ha sido eliminado.');
+      Alert.alert(
+        'Confirmar eliminación',
+        '¿Estás seguro de que quieres eliminar este servicio de comercio?',
+        [
+          { text: 'Cancelar', style: 'cancel' },
+          {
+            text: 'Eliminar',
+            onPress: async () => {
+              await axios.delete(`http://localhost:8080/inicio/eliminarServicioComercio?mail=${mail}&idServicio=${idServicio}`);
+              // Actualizar la lista de servicios de comercio después de eliminar
+              fetchServiciosComercio();
+              Alert.alert('Eliminación exitosa', 'El servicio de comercio ha sido eliminado.');
+            },
+          },
+        ],
+        { cancelable: false }
+      );
     } catch (error) {
       console.error('Error al eliminar el servicio de comercio:', error);
       Alert.alert('Error', 'No se pudo eliminar el servicio de comercio.');

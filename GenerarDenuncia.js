@@ -19,7 +19,7 @@ const GenerarDenuncia = ({ route, navigation }) => {
 
   const getSitios = async () => {
     try {
-      const response = await axios.get('http://192.168.0.241:8080/inicio/sitios');
+      const response = await axios.get('http://localhost:8080/inicio/sitios');
       setSitios(response.data);
     } catch (error) {
       console.error('Error al obtener sitios:', error);
