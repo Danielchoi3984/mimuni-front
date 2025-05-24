@@ -33,8 +33,12 @@ This repository contains the **mobile frontend** of the system, developed with:
 > The backend was developed separately and is not included in this repository.
 <h2>🛠️Backend</h2>
 
-- Eclipse IDE
-
 - Java
 
-- Spring Boot con JPA
+- Spring Boot
+
+- Spring Data JPA
+
+- MYSQL
+
+- Eclipse IDE
